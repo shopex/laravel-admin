@@ -8,7 +8,7 @@ use GuzzleHttp\Client as HttpClient;
 use Illuminate\Foundation\Auth\RedirectsUsers;
 use Illuminate\Support\Facades\Session;
 use Shopex\LubanAdmin\Model\LoginSession;
-use Shopex\Luban\Facades\LubanFacade as Luban;
+use Shopex\Luban\Facades\Luban;
 
 trait AuthenticatesUsers
 {
