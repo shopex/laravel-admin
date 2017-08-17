@@ -1,18 +1,19 @@
 {
-    "name": "appzcoder/laravel-admin",
+    "name": "shopex/luban-admin",
     "license": "MIT",
-    "description": "Laravel Admin Panel",
+    "description": "Luban Laravel Admin Panel",
     "keywords": [
         "laravel",
         "admin",
+        "shopex",
+        "luban",
         "laravel admin",
         "laravel admin panel"
     ],
     "authors": [
         {
-            "name": "Sohel Amin",
-            "email": "sohelamincse@gmail.com",
-            "homepage": "http://www.appzcoder.com"
+            "name": "shopex",
+            "email": "dev@shopex.cn"
         }
     ],
     "require": {
@@ -23,7 +24,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Appzcoder\\LaravelAdmin\\": "src/"
+            "Shopex\\LubanAdmin\\": "src/"
         }
     }
 }
