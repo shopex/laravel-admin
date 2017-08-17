@@ -19,7 +19,7 @@ class ProcessController extends Controller
      */
     public function getGenerator()
     {
-        return view('laravel-admin::generator');
+        return view('admin::admin/generator');
     }
 
     /**
