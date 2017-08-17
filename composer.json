@@ -20,7 +20,8 @@
         "php": ">=5.5.9",
         "illuminate/support": "^5.1",
         "appzcoder/crud-generator": "^2.0",
-        "laravelcollective/html": "~5.1"
+        "laravelcollective/html": "~5.1",
+        "guzzlehttp/guzzle": "^6.3"   
     },
     "autoload": {
         "psr-4": {

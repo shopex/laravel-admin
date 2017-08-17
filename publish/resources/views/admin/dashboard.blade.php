@@ -1,4 +1,4 @@
-@extends('layouts.backend')
+@extends('admin::layout')
 
 @section('content')
 <div class="container">

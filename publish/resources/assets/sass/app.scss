@@ -1,0 +1,31 @@
+body{
+	padding-top: 60px;
+}
+h1{
+	font-size: 2rem;
+}
+
+.app-sel{
+	width:22rem;
+	margin:0;
+	padding:1rem;
+}
+.app-sel li{
+	float:left;
+	margin:0.5rem 0;
+}
+.app-sel li a{
+	text-align: center;
+	display: block;
+}
+.app-sel img{
+	width:3rem;
+	height:3rem;
+}
+
+.search-form{position: relative}
+.search-form .dropdown-menu{display:none;}
+.search-opts{min-height:190px;}
+.search-opts a{display: block;padding:5px 10px; text-decoration: none; color:#666;}
+.search-opts a:hover{background: $component-active-bg; color:$component-active-color;}
+.search-panel-footer{border-top:1px solid #ccc; margin:0 10px; padding:10px 0 5px 0; text-align: right}

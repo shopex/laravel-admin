@@ -1,6 +1,6 @@
 <?php
 
-namespace Appzcoder\LaravelAdmin\Controllers;
+namespace Shopex\LubanAdmin\Controllers;
 
 use App\Http\Controllers\Controller;
 use Artisan;

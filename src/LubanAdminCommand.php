@@ -1,12 +1,12 @@
 <?php
 
-namespace Appzcoder\LaravelAdmin;
+namespace Shopex\LubanAdmin;
 
 use File;
 use Illuminate\Console\Command;
 use Symfony\Component\Process\Process;
 
-class LaravelAdminCommand extends Command
+class LubanAdminCommand extends Command
 {
     /**
      * The name and signature of the console command.
