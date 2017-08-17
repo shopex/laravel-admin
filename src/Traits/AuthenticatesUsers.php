@@ -163,6 +163,8 @@ trait AuthenticatesUsers
         $login_sess = LoginSession::where('session_id', $request->session()->getId())->first();
         if($login_sess){
             $logout_url = $this->get_sso_url('logout', 'redirect='.urlencode(url('/')).'&token='.$login_sess->sso_logout_token);
+        }else{
+            $logout_url = '/';
         }
 
         $this->guard()->logout();        

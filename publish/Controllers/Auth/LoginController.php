@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Shopex\LubanAdmin\Http\Traits\AuthenticatesUsers;
+use Shopex\LubanAdmin\Traits\AuthenticatesUsers;
 use Shopex\Luban\Facades\LubanFacade as Luban;
 
 class LoginController extends Controller
