@@ -10,15 +10,6 @@ use Session;
 
 class AdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return void
-     */
-    public function index()
-    {
-        return view('admin.dashboard');
-    }
 
     /**
      * Display given permissions to role.
@@ -30,7 +21,7 @@ class AdminController extends Controller
         $roles = Role::select('id', 'name', 'label')->get();
         $permissions = Permission::select('id', 'name', 'label')->get();
 
-        return view('admin.permissions.role-give-permissions', compact('roles', 'permissions'));
+        return view('admin::permissions.role-give-permissions', compact('roles', 'permissions'));
     }
 
     /**

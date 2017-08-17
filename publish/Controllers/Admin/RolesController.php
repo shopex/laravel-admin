@@ -26,7 +26,7 @@ class RolesController extends Controller
             $roles = Role::paginate($perPage);
         }
 
-        return view('admin.roles.index', compact('roles'));
+        return view('admin::roles.index', compact('roles'));
     }
 
     /**
@@ -36,7 +36,7 @@ class RolesController extends Controller
      */
     public function create()
     {
-        return view('admin.roles.create');
+        return view('admin::roles.create');
     }
 
     /**
@@ -68,7 +68,7 @@ class RolesController extends Controller
     {
         $role = Role::findOrFail($id);
 
-        return view('admin.roles.show', compact('role'));
+        return view('admin::roles.show', compact('role'));
     }
 
     /**
@@ -82,7 +82,7 @@ class RolesController extends Controller
     {
         $role = Role::findOrFail($id);
 
-        return view('admin.roles.edit', compact('role'));
+        return view('admin::roles.edit', compact('role'));
     }
 
     /**
