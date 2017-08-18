@@ -135,6 +135,8 @@
 		@yield('content')
     </div>
 
+	@yield('scripts')
+
     <script>
     @if (isset($searchbar) and $searchbar)
     var searchbar = {!! json_encode($searchbar) !!};
