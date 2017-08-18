@@ -1,5 +1,7 @@
 @extends('layouts.backend')
 
+@section('title', 'Create New %%modelName%%')
+
 @section('content')
     <div class="container">
         <div class="row">

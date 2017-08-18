@@ -1,5 +1,7 @@
 @extends('layouts.backend')
 
+@section('title', '%%crudNameCap%%')
+
 @section('content')
     <div class="container">
         <div class="row">

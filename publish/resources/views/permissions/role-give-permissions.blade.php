@@ -1,5 +1,7 @@
 @extends('admin::layout')
 
+@section('title', 'Give Permission to Role')
+
 @section('content')
     <div class="container">
         <div class="row">
