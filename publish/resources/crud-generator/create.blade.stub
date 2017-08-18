@@ -3,33 +3,27 @@
 @section('title', 'Create New %%modelName%%')
 
 @section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Create New %%modelName%%</div>
-                    <div class="panel-body">
-                        <a href="{{ url('/%%routeGroup%%%%viewName%%') }}" title="Back"><button class="btn btn-warning btn-xs"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</button></a>
-                        <br />
-                        <br />
+    <div class="panel panel-default">
+        <div class="panel-heading">Create New %%modelName%%</div>
+        <div class="panel-body">
+            <a href="{{ url('/%%routeGroup%%%%viewName%%') }}" title="Back"><button class="btn btn-warning btn-xs"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</button></a>
+            <br />
+            <br />
 
-                        @if ($errors->any())
-                            <ul class="alert alert-danger">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        @endif
+            @if ($errors->any())
+                <ul class="alert alert-danger">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            @endif
 
-                        {!! Form::open(['url' => '/%%routeGroup%%%%viewName%%', 'class' => 'form-horizontal', 'files' => true]) !!}
+            {!! Form::open(['url' => '/%%routeGroup%%%%viewName%%', 'class' => 'form-horizontal', 'files' => true]) !!}
 
-                        @include ('%%viewTemplateDir%%.form')
+            @include ('%%viewTemplateDir%%.form')
 
-                        {!! Form::close() !!}
+            {!! Form::close() !!}
 
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 @endsection
