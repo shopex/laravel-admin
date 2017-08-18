@@ -29,3 +29,13 @@ h1{
 .search-opts a{display: block;padding:5px 10px; text-decoration: none; color:#666;}
 .search-opts a:hover{background: $component-active-bg; color:$component-active-color;}
 .search-panel-footer{border-top:1px solid #ccc; margin:0 10px; padding:10px 0 5px 0; text-align: right}
+
+.appbanner{
+	top:0;
+	height: 100%;
+	padding:0.5rem;
+	margin:0 1rem 0 0;
+}
+.navbar-brand{
+	padding:0;
+}

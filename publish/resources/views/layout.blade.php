@@ -21,7 +21,9 @@
 	        <span class="icon-bar"></span>
 	        <span class="icon-bar"></span>
 	      </button>
-	      <span class="navbar-brand">{{$app_name}}</span>
+	      <span class="navbar-brand">
+	      	<img class="appbanner" src="{{ url('/appbanner.png') }}" />
+	      </span>
 	    </div>
 	    <div id="navbar" class="navbar-collapse collapse">
 	      <ul class="nav navbar-nav hide-in-search">
