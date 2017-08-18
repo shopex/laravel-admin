@@ -18,7 +18,7 @@
                             <input type="text" class="form-control" name="search" placeholder="Search...">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="submit">
-                                    <i class="fa fa-search"></i>
+                                    <i class="glyphicon glyphicon-search"></i>
                                 </button>
                             </span>
                         </div>
