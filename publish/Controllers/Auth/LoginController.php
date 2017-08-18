@@ -22,9 +22,6 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     protected $redirectTo = '/home';
-    protected $sso_app_id;
-    protected $sso_app_secret;
-    protected $sso_url;
 
     /**
      * Create a new controller instance.
