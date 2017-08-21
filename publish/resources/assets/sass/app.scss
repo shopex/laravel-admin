@@ -1,10 +1,3 @@
-body{
-	padding-top: 60px;
-}
-h1{
-	font-size: 2rem;
-}
-
 .app-sel{
 	width:22rem;
 	margin:0;
@@ -30,12 +23,143 @@ h1{
 .search-opts a:hover{background: $component-active-bg; color:$component-active-color;}
 .search-panel-footer{border-top:1px solid #ccc; margin:0 10px; padding:10px 0 5px 0; text-align: right}
 
-.appbanner{
+.admin-page{
+	position: absolute;
 	top:0;
-	height: 100%;
-	padding:0.5rem;
-	margin:0 1rem 0 0;
+	left:0;
+	right:0;
+	bottom:0;
+	display: flex;
+	flex-direction: column;
 }
-.navbar-brand{
+.admin-header{
+	flex:1;
+	min-height: 5rem; 
+	display: flex; 
+	line-height: 5rem;
+	padding:0 1rem;
+	background: #fff;
+	border-bottom: 1px solid #ccc;
+}
+.admin-header-title{
+	flex:1;
+	min-width: 20rem;
+}
+.admin-header-searchbar{
+	flex:50;
+}
+.admin-header-content{
+	flex:50;
+	text-align: right;
+}
+.admin-header-content .dropdown>a{
+	padding: 2rem;
+	color: #666;
+	text-decoration: none;
+}
+.admin-header-content .dropdown.open>a{
+	background: #f0f0f0;
+}
+.admin-header-content .dropdown-menu{
+	margin-top:1.5rem;
+}
+.admin-header-searchbar input{
+	line-height: 2.4rem;
+	margin:1.3rem 0;
+	padding:0 0.5rem;
+	background: transparent;
+	border:1px solid #ccc;
+}
+.admin-main{
+	flex:99;
+	overflow: auto;
+	display: flex; 
+	background: #fff;
+}
+.admin-sidebar{
+	flex:1;
+	min-width: 20rem;
+	overflow-x: hidden;
+	overflow-y: auto;
+	border-right:1px solid #ccc;
+}
+.main-content{
+	flex:99;
+	flex-direction: column;
+	display: flex;
+}
+.main-header{
+	flex: 0 0 auto;
+	overflow-x:hidden;
+	border-bottom: 1px solid #ccc;
+}
+.main-body{
+	flex: 1 1 auto;
+	overflow-y: auto;
+	overflow-x:hidden;
+}
+.main-footer{
+	flex: 0 0 auto;
+	border-top: 1px solid #ccc;
+	overflow-x:hidden;
+}
+.main-body>.container{
+	padding: 1rem;
+}
+.appbanner{
+	height:3rem;
+	margin:1rem;
+}
+.admin-sidebar ul{
+	margin:0;
 	padding:0;
 }
+.admin-sidebar li{
+	list-style: none;
+}
+.admin-sidebar>ul>li>a{
+	padding-left: 1rem;
+	line-height: 4rem;
+	height: 4rem;
+	display: block;
+	text-decoration: none;
+	border-bottom:1px solid #f0f0f0;
+	color: #666;
+}
+
+.main-header .main-header-basic{
+	display: flex;
+}
+.main-header .breadcrumb{
+	flex:1 0 auto;
+	min-width: 10rem;
+}
+.main-header .main-header-action{
+	flex:50;
+	padding: 0.5rem;
+}    
+.main-header .breadcrumb{
+	font-weight: bold;
+	line-height: 4rem;
+	margin:0;
+	padding:0 0 0 0.5rem;
+	background: transparent;
+}
+
+.finder-body .row, .finder-header .row{
+	padding-left: 0.5rem;
+	line-height: 3rem;
+	height:3rem;
+	white-space: nowrap;
+	overflow: hidden;	
+}
+.finder-header .row{
+	background: #666;color:#fff;
+}
+.finder-body .row{
+	border-bottom: 1px solid #ccc;	
+}
+.finder-group-title.row{
+	background: #f0f0f0;color:#000;
+}
+

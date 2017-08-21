@@ -8,75 +8,38 @@
     <title>@yield('title') - {{$app_name}}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">    
     <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
-    <script src="{{ mix('/js/app.js') }}"></script>    
+    <script src="{{ mix('/js/app.js') }}"></script>
   </head>
+
 <body>
+	<div class="admin-page">
+		<div class="admin-header" id="app-header">
 
-	<nav class="navbar navbar-default navbar-fixed-top" id="app-header">
-	  <div class="container">
-	    <div class="navbar-header">
-	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-	      <span class="navbar-brand">
-	      	<img class="appbanner" src="{{ url('/appbanner.png') }}" />
-	      </span>
-	    </div>
-	    <div id="navbar" class="navbar-collapse collapse">
-	      <ul class="nav navbar-nav hide-in-search">
-	      	@foreach ($app_menus as $menu)
+			<div class="admin-header-title">
+				<img class="appbanner" src="{{ url('/appbanner.png') }}" />
+			</div>
 
-	  		@if (Auth::guest())
-	  			@if (isset($menu['user-only']) and $menu['user-only'])
-	  				@continue;
-	  			@endif
-	  		@else
-	  			@if (isset($menu['guest-only']) and $menu['guest-only'])
-	  				@continue;
-	  			@endif
-	  		@endif
+			@if (Auth::guest())
+			<div class="admin-header-content">
+				<a href="{{ url('/login') }}" type="button" class="btn btn-default external">登陆系统</a>
+			</div>
+			@else
 
-	      	@if (isset($menu['items']) and count($menu['items']) > 0)
-	        <li class="dropdown">
-	          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-	          {{$menu['label']}} <span class="caret"></span></a>
-	          <ul class="dropdown-menu">
-	          	@foreach ($menu['items'] as $item)
-		          	@if (isset($item['label']))
-			          	<li>
-			          	<a href="{{ url($item['link']) }}">
-			          	@if (isset($item['icon']))
-			          	<i class="glyphicon {{ $item['icon'] }}"></i>
-			          	@else
-			          	<i style="display:inline-block;width:1em"></i>
-			          	@endif
-			          	{{$item['label']}}
-			          	</a>
-			          	</li>
-		          	@else
-			          	<li role="separator" class="divider"></li>
-		          	@endif
-	          	@endforeach
-	          </ul>
-	        </li>
-	      	@else	        
-			<li><a href="{{ url($menu['link']) }}">{{$menu['label']}}</a></li>	        
-	        @endif
-			@endforeach
-	      </ul>
+			<div class="admin-header-searchbar">
+		      <input type="text" />
 
-            @if (Auth::guest())
-			<a href="{{ url('/login') }}" type="button" class="btn btn-default navbar-btn navbar-right external">登陆系统</a>
-            @else			
-	      	<ul class="nav navbar-nav navbar-right">
-				<li class="dropdown">
+			  @if (false and isset($searchbar) and $searchbar)
+			  	<searchbar :items="searchbar"></searchbar>
+		      @endif      
+			</div>
+
+			<div class="admin-header-content">
+
+				<span class="dropdown">
 				  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				    <i class="glyphicon glyphicon-th"></i>
 				  </a>
-				  <ul class="dropdown-menu app-sel">
+				  <ul class="dropdown-menu dropdown-menu-right app-sel">
 				    <li>
 					    <a href="#">
 					    	<img src="https://git.shopex.cn/img/favicon.png" width="48px" />
@@ -102,13 +65,13 @@
 					    </a>
 				    </li>
 				  </ul>
-				</li>
+				</span>
 
-                <li class="dropdown">
+                <span class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                         {{ Auth::user()->name }} <span class="caret"></span>
                     </a>  
-                    <ul class="dropdown-menu" role="menu">
+                    <ul class="dropdown-menu-right dropdown-menu" role="menu">
                         <li>
 		                    <a href="{{ Luban::config()->get('sso_url') }}/profile" target="_blank" class="external">
 		                        帐号设置
@@ -124,28 +87,90 @@
                             </form>
                         </li>
                     </ul>
-                </li>
-	      </ul>
-	      @if (isset($searchbar) and $searchbar)
-		  	<searchbar :items="searchbar"></searchbar>
-	      @endif
-        @endif
-	  </div>
-	</nav>
+                </span>
+			</div>
+			@endif
 
-    <div class="container main-content">
+		</div>
 
- 		@if (Session::has('flash_message'))
-            <div class="alert alert-success">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                {{ Session::get('flash_message') }}
-            </div>
-        @endif
+		@if (Auth::guest())
+		<div class="admin-main">
+			<div class="container main-content">
+				@yield('content')
+			</div>
+		</div>
+		@else
+    	<div class="admin-main">
+	    	<div class="admin-sidebar">
 
-		@yield('content')
+		      <ul>
+		      	@foreach ($app_menus as $menu)
+
+		  		@if (Auth::guest())
+		  			@if (isset($menu['user-only']) and $menu['user-only'])
+		  				@continue;
+		  			@endif
+		  		@else
+		  			@if (isset($menu['guest-only']) and $menu['guest-only'])
+		  				@continue;
+		  			@endif
+		  		@endif
+
+		      	@if (isset($menu['items']) and count($menu['items']) > 0)
+		        <li>
+		          <a>{{$menu['label']}} <span class="caret"></span></a>
+		          <ul>
+		          	@foreach ($menu['items'] as $item)
+			          	@if (isset($item['label']))
+				          	<li>
+				          	<a href="{{ url($item['link']) }}">
+				          	@if (isset($item['icon']))
+				          	<i class="glyphicon {{ $item['icon'] }}"></i>
+				          	@else
+				          	<i style="display:inline-block;width:1em"></i>
+				          	@endif
+				          	{{$item['label']}}
+				          	</a>
+				          	</li>
+			          	@else
+				          	<li role="separator" class="divider"></li>
+			          	@endif
+		          	@endforeach
+		          </ul>
+		        </li>
+		      	@else	        
+				<li><a href="{{ url($menu['link']) }}">{{$menu['label']}}</a></li>	        
+		        @endif
+				@endforeach
+		      </ul>
+
+			</div>
+
+			<div class="main-content">
+				<div class="main-header">
+					<div class="main-header-basic">
+						<ol class="breadcrumb">
+						  <li class="active">@yield('title')</li>
+						</ol>
+						<div class="main-header-action">
+							@yield('action-bar')
+						</div>
+					</div>
+					@if (array_key_exists('header', View::getSections()))
+					<div class="main-header-custom">@yield('header')</div>
+					@endif
+				</div>
+
+				<div class="main-body">@yield('content')</div>
+				@if (array_key_exists('footer', View::getSections()))
+				<div class="main-footer">@yield('footer')</div>
+				@endif
+			</div>
+	    </div>
+	    @endif
+
     </div>
-
-	@yield('scripts')
+    </body>
 
     <script>
     @if (isset($searchbar) and $searchbar)
@@ -159,6 +184,6 @@
   		data: {
   			searchbar: searchbar
   		}
-  	});    
+  	});
     </script>
 </html>

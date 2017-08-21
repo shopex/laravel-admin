@@ -29,11 +29,13 @@ class LubanAdminProvider extends ServiceProvider
             __DIR__ . '/../../publish/migrations/' => database_path('migrations'),
             __DIR__ . '/../../publish/Model/' => app_path(),
             __DIR__ . '/../../publish/Controllers/' => app_path('Http/Controllers'),
+        ], 'php');
+
+        $this->publishes([
             __DIR__ . '/../../publish/resources/assets' => base_path('resources/assets/vendor/admin'),
             __DIR__ . '/../../publish/resources/crud-generator' => base_path('resources/crud-generator'),
             __DIR__ . '/../../publish/resources/views' => base_path('resources/views/vendor/admin'),
-            // __DIR__ . '/../../publish/crudgenerator.php' => config_path('crudgenerator.php'),
-        ]);
+        ], 'resources');
     }
 
     /**

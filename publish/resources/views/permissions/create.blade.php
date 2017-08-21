@@ -2,34 +2,26 @@
 
 @section('title', 'Create Permission')
 
+@section('action-bar')
+    <a href="{{ url('/admin/permissions') }}" title="Back">
+        <button class="btn btn-warning btn-xs"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</button>
+    </a>
+@endsection
+
 @section('content')
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Create Permission</div>
-                    <div class="panel-body">
-                        <a href="{{ url('/admin/permissions') }}" title="Back"><button class="btn btn-warning btn-xs"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</button></a>
-                        <br />
-                        <br />
+        @if ($errors->any())
+            <ul class="alert alert-danger">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        @endif
 
-                        @if ($errors->any())
-                            <ul class="alert alert-danger">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        @endif
+        {!! Form::open(['url' => '/admin/permissions', 'class' => 'form-horizontal']) !!}
 
-                        {!! Form::open(['url' => '/admin/permissions', 'class' => 'form-horizontal']) !!}
+        @include ('admin::permissions.form')
 
-                        @include ('admin.permissions.form')
-
-                        {!! Form::close() !!}
-
-                    </div>
-                </div>
-            </div>
-        </div>
+        {!! Form::close() !!}
     </div>
 @endsection
