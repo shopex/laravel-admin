@@ -146,20 +146,79 @@
 	background: transparent;
 }
 
-.finder-body .row, .finder-header .row{
+.finder-body .row, .finder-header .finder-row .row{
 	padding-left: 0.5rem;
 	line-height: 3rem;
 	height:3rem;
 	white-space: nowrap;
 	overflow: hidden;	
 }
-.finder-header .row{
-	background: #666;color:#fff;
-}
-.finder-body .row{
-	border-bottom: 1px solid #ccc;	
+.finder-header .finder-row{
+	border-left: 0.3rem solid #666;	
+	background: #666;
+	color:#fff;
 }
 .finder-group-title.row{
-	background: #f0f0f0;color:#000;
+	background: #f0f0f0;
+	color:#000;
+}
+.finder-row{
+	display: flex;
+}
+.finder-col-sel{
+	flex:1 0 auto;
+	width:3rem;
+	z-index: 99;
+	text-align: center;
+	line-height: 3rem;
+	margin:0;
+}
+.finder-row .row{
+	flex: 999;
+	cursor: pointer;
+}
+.finder-item{
+	border-left: 0.3rem solid transparent;
+	border-bottom: 1px solid #ccc;
+}
+.finder-item.detail{
+	border-left-color: #0769ad;
+}
+.finder-item.selected{
+	background: #f0f0f0;
+}
+.finder-detail{
+	border-top: 1px dashed #ccc;
+}
+.finder-detail .nav-tabs{
+	padding: 0.5rem 0.5rem 0 0.5rem;
+	display: flex;
+	/*justify-content: center;*/
+}
+.finder-detail .nav-tabs li{
+
+}
+.finder-detail .nav > li > a{
+	padding: 0.3rem 1rem;
+	cursor: pointer;
+}
+.finder-detail-content{
+	margin: 0.5rem;
+	min-height: 30rem;
+	overflow: hidden;
+	word-break: break-all;
+}
+.finder-search-bar{
+	border-top: 1px solid #ccc;
+	background: #ffc;
 }
 
+#indicator{
+	position: absolute;
+	left:0;
+	top:0;
+	z-index: 9999;
+	right:0;
+	height:3px;
+	background: #090;
+}

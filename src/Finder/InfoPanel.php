@@ -2,6 +2,9 @@
 namespace Shopex\LubanAdmin\Finder;
 
 class InfoPanel{
-	public $method;
+	
+	use Shared;
+
+	public $handle;
 	public $label;
 }

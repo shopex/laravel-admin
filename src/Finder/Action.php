@@ -2,7 +2,10 @@
 namespace Shopex\LubanAdmin\Finder;
 
 class Action{
-	public $method;
+	
+	use Shared;
+
 	public $label;
-	public $httpMethod;
+	public $handle;
+	public $url;
 }

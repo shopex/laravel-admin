@@ -170,6 +170,17 @@
 	    @endif
 
     </div>
+
+    <div class="main-script">
+    	@yield('scripts')
+    </div>
+
+    <div id="indicator" style="display: none">
+    	<div class="indicator-container">
+    		<div class="indicator-process"></div>
+    	</div>
+    </div>
+
     </body>
 
     <script>
