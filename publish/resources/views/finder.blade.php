@@ -5,30 +5,47 @@
 @section('action-bar')
 <div style="display: flex">
 	<div style="flex:0 0 auto">
-		<a v-for="(action, idx) in finder.actions" class="btn btn-default" v-bind:href="action.url">
-			@{{action.label}}
-		</a>
+		<div class="btn-group" role="group">
+			<a v-for="(action, idx) in finder.actions" class="btn btn-default" v-bind:href="action.url">
+				@{{action.label}}
+			</a>
+		</div>
 	</div>
-	<div style="flex:1 0 auto;">
-		tabbers
-	</div>
-	<div style="flex:0 0 auto;cursor: pointer;">
-		@if (array_key_exists('search', View::getSections()))
-			<span v-if="is_show_search_bar" v-on:click="is_show_search_bar=false">隐藏高级搜索</span>
-			<span v-else="is_show_search_bar" v-on:click="is_show_search_bar=true">显示高级搜索</span>
-		@endif
+	<div class="finder-tabber">
+		  <ul class="nav nav-tabs" role="tablist">
+		    <li v-for="(panel, tab_id) in finder.tabs" v-bind:class="{'active': tab_id==current_tab}">
+		    	<a v-on:click="select_tab(tab_id)">@{{panel.label}}</a>
+		    </li>
+		    @if (array_key_exists('search', View::getSections()))
+		    <li v-bind:class="{'active': 'searchbar'==current_tab}">
+		    	<a v-on:click="select_tab('searchbar')">
+			    	<i class="glyphicon glyphicon-search"></i>
+			    	搜索
+		    	</a>
+		    </li>
+		    @endif
+			<li v-bind:class="{'active': 'workdesk'==current_tab}">
+		    	<a v-on:click="select_tab('workdesk')">
+					<i class="glyphicon glyphicon-duplicate"></i>		    	
+		    		操作台
+		    	</a>
+		    </li>
+		  </ul>
 	</div>
 </div>
 @endsection
 
 @section('header')
 <div class="finder-header">
-	<div class="finder-search-bar" v-if="is_show_search_bar">
+	<div class="finder-search-bar" v-if="'searchbar'==current_tab">
 		@yield('search')
+	</div>
+	<div class="finder-workdesk-bar" v-if="'workdesk'==current_tab">
+		操作台: 一个临时收纳台.
 	</div>
 	<div class="finder-row">
 		<label class="finder-col-sel" v-if="finder.batchActions.length>0">
-			<input type="checkbox" v-on:click="select_all" />
+			<input type="checkbox" v-on:click="select_all" v-model="v_select_all" />
 		</label>
 		<div class="row api-top-title">
 			<div v-for="(col, col_id) in finder.cols" v-bind:class="col_class[col_id]">
@@ -43,14 +60,6 @@
 <div style="height:3rem; position: relative; line-height: 3rem; padding:0 0.5rem">
 	<div>
 	页码
-	</div>
-	<div style="position: absolute; left:0; top:0; background: #000;color:#fff;padding:0 0.5rem;" v-if="selected_count>0">
-		<span>
-		已选择: @{{selected_count}}项
-		</span>
-		<span v-for="(action, idx) in finder.batchActions">
-			<button class="btn btn-default btn-sm">@{{action.label}}</button>
-		</span>
 	</div>
 </div>
 @endsection
@@ -71,18 +80,30 @@
 		</div>
 		<div class="finder-detail" v-if="current_detail==idx">
 			  <ul class="nav nav-tabs" role="tablist">
-			    <li v-for="(panel, panel_id) in finder.infoPanels" v-bind:class="{'active': panel_id==current_tab}">
+			    <li v-for="(panel, panel_id) in finder.infoPanels" v-bind:class="{'active': panel_id==current_panel}">
 			    	<a v-on:click="show_panel(idx, panel_id)">@{{panel.label}}</a>
 			    </li>
 			  </ul>
 			  <div class="tab-content">
-			    <div role="tabpanel" class="tab-pane active" v-for="(panel, panel_id) in finder.infoPanels" v-if="panel_id==current_tab">
+			    <div role="tabpanel" class="tab-pane active" v-for="(panel, panel_id) in finder.infoPanels" v-if="panel_id==current_panel">
 			    	<div class="finder-detail-content" v-html="item.panels[panel_id]"></div>
 			    </div>
 			  </div>
 		</div>
 	</div>
 
+</div>
+
+<div class="finder-batch-action-bar" v-if="selected_count>0">
+	<div>
+		<span>
+		已选择: @{{selected_count}}项
+		</span>
+
+		<div class="btn-group" role="group">
+			<button v-for="(action, idx) in finder.batchActions" class="btn btn-default btn-sm">@{{action.label}}</button>
+		</div>
+	</div>
 </div>
 @endsection
 
@@ -118,8 +139,12 @@ $(function(){
 	  },
 	  methods:{
 		select_all: function(e){
-			for(var i=0;i<this.finder.items.length;i++){
-				this.$set(this.selected, i, e.target.checked)
+			if(this.v_select_all){
+				for(var i=0;i<this.finder.items.length;i++){
+					this.$set(this.selected, i, true);
+				}
+			}else{
+				this.selected = [];
 			}
 		},
 		toggle_detail: function(id){
@@ -129,6 +154,11 @@ $(function(){
 				this.current_detail = id;
 				this.show_panel(id, 0);
 			}
+		},
+		select_tab: function(tab_id){
+			this.current_tab = tab_id;
+			this.selected = [];
+			this.v_select_all = false;
 		},
 		show_panel: function(item_idx, panel_id){		
 			if(!this.finder.items[item_idx]){
@@ -147,13 +177,14 @@ $(function(){
 					that.$set(that.finder.items[item_idx].panels, panel_id, response);
 				});
 			}
-			this.current_tab = panel_id;
+			this.current_panel = panel_id;
 		}
 	  },
 	  data: {
 	  	is_show_search_bar: false,
 	    finder: {!! $finder->json() !!},
 	    current_detail: undefined,
+	    current_panel: 0,
 	    current_tab: 0,
 	    selected: []
 	  }
