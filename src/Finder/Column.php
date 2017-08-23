@@ -12,4 +12,12 @@ class Column{
 	public $size = 2;
 	public $className;
 	public $modifier;
+	public $html = false;
+
+	public $hidden = ['modifier'];
+
+	function id(){
+		$this->_finder->setId($this->$key);
+		return $this;
+	}
 }

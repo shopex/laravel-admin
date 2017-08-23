@@ -3,7 +3,8 @@
 	line-height: 3rem;
 	height:3rem;
 	white-space: nowrap;
-	overflow: hidden;	
+	overflow: hidden;
+	cursor: default;
 }
 .finder-header .finder-row{
 	border-left: 0.3rem solid #666;	
@@ -15,6 +16,7 @@
 	color:#000;
 }
 .finder-row{
+	clear:both;
 	display: flex;
 }
 .finder-col-sel{
@@ -62,7 +64,8 @@
 }
 .finder-search-bar{
 	border-top: 1px solid #ccc;
-	background: #ffc;
+	padding: 0.5rem;
+	background: #f0f0f0;
 }
 .finder-workdesk-bar{
 	border-top: 1px solid #ccc;
@@ -82,14 +85,22 @@
 .finder-batch-action-bar>div{
 	border:1px solid #ccc;
 	padding:1rem;
-	background: #f0f0f0;
+	background: #000;
+	color: #ccc;
 	z-index: 999;
 	border-top-left-radius: 1rem;
 	border-top-right-radius: 1rem;
 	border-bottom: none;
 }
+.finder-batch-action-bar .btn-default{
+	background: #000;
+	color: #ccc;
+}
+.finder-action-bar > div{
+	line-height: 3rem;
+}
 .finder-tabber{
-	flex:1 0 auto; 
+	flex:1; 
 	padding-left: 2.5rem;
 	margin:-0.4rem; 
 	display: flex; 
@@ -103,4 +114,31 @@
 .finder-tabber .nav > li > a{
 	cursor: pointer;
 	padding: 0.7rem 1.5rem;
+}
+.finder-action-bar{
+	display: flex;
+}
+.finder-pager{
+	flex:0 0;
+	text-align: right;
+	white-space: nowrap;
+}
+.finder-pager >.dropdown > .btn-default{
+	border: none;
+}
+.finder-masker{
+	background: #fff; 
+	z-index: 9999; 
+	position: absolute; 
+	width: 100%; 
+	height: 100%; 
+	left:0; top:0;
+}
+
+.finder-search-bar .form-inline{
+	display: inline-block;
+	margin: 0 3rem 0.5rem 0;
+}
+.finder-user-header{
+	border-top: 1px solid #ccc;
 }

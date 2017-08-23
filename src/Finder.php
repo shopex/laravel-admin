@@ -4,8 +4,9 @@ namespace Shopex\LubanAdmin;
 use Shopex\LubanAdmin\Finder\Action;
 use Shopex\LubanAdmin\Finder\Column;
 use Shopex\LubanAdmin\Finder\InfoPanel;
-use Shopex\LubanAdmin\Finder\SearchOption;
+use Shopex\LubanAdmin\Finder\Search;
 use Shopex\LubanAdmin\Finder\Tab;
+use Shopex\LubanAdmin\Finder\Sort;
 use Illuminate\Support\Facades\Route;
 
 class Finder{
@@ -16,9 +17,14 @@ class Finder{
 	private $_tabs = [];
 	private $_actions = [];
 	private $_batch_actions = [];
-	private $_searchOptions = [];
+	private $_searchs = [];
 	private $_infoPanels = [];
 	private $_columns = [];
+	private $_sorts = [];
+	private $_pagenum = 20;
+	private $_current_sort_id = 0;
+	private $_current_tab_id = 0;
+	private $_id_column = '';
 
 	static function new($model, $title){
 		$finder = new Finder;
@@ -30,6 +36,7 @@ class Finder{
 		$finder->setBaseUrl('/'.$currentPath);
 		$finder->setModel($model);
 		$finder->setTitle($title);
+		$request = request();
 		return $finder;
 	}
 
@@ -46,16 +53,27 @@ class Finder{
 		return $this;
 	}
 
+	public function addSort(){
+		$args = func_get_args();
+		$sort = new Sort($this);
+
+		$sort->label = array_shift($args);
+		$sort->orderBy = $args;
+
+		$this->_sorts[] = $sort;
+		return $sort;
+	}
+
 	public function addAction($label, $do){
 		$action = $this->mkAction($label, $do);
 		$this->_actions[] = $action;
-		return $this;
+		return $action;
 	}
 
 	public function addBatchAction($label, $do){
 		$action = $this->mkAction($label, $do);
 		$this->_batch_actions[] = $action;
-		return $this;
+		return $action;
 	}
 
 	public function mkAction($label, $do){
@@ -71,11 +89,16 @@ class Finder{
 		return $action;
 	}
 
-	public function addTab($label, $options){
+	public function addTab($label, $filters=[]){
 		$tab = new Tab($this);
 		$tab->label = $label;
-		$tab->options = $options;
+		$tab->filters = $filters;
 		$this->_tabs[] = $tab;
+		return $tab;
+	}
+
+	public function setId($colname){
+		$this->_id_column = $colname;
 		return $this;
 	}
 
@@ -84,16 +107,16 @@ class Finder{
 		$panel->handle = $handle;
 		$panel->label = $label;
 		$this->_infoPanels[] = $panel;
-		return $this;
+		return $panel;
 	}
 
-	public function addSearchOption($label, $key, $optionType){
-		$search = new SearchOption($this);
-		$search->key = $key;
+	public function addSearch($label, $key, $type=''){
+		$search = new Search($this);
 		$search->label = $label;
-		$search->optionType = $optionType;
-		$this->_searchOptions[] = $search;
-		return $this;
+		$search->key = $key;		
+		$search->type = $type;
+		$this->_searchs[] = $search;
+		return $search;
 	}
 
 	public function addColumn($label, $key){
@@ -102,7 +125,7 @@ class Finder{
 		$col->key = $key;
 		$this->_columns[] = $col;
 		return $col;
-	}	
+	}
 
 	public function actions(){
 		return $this->_actions;
@@ -128,10 +151,29 @@ class Finder{
 				$cols[] = $col->key;
 			}
 		}
+
+		$cols[] = $this->_id_column;
+
 		$query = call_user_func_array([$this->model, 'select'], $cols);
-		$rows = $query->get();
-		foreach($rows as $row){
+		if(isset($this->_sorts[$this->_current_sort_id])){
+			$query = call_user_func_array([$query, 'orderBy'], 
+				$this->_sorts[$this->_current_sort_id]->orderBy);
+		}
+		if(isset($this->_tabs[$this->_current_tab_id])){
+			foreach($this->_tabs[$this->_current_tab_id]->filters as $filter){
+				$query = call_user_func_array([$query, 'where'], $filter);
+			}
+		}
+		if(isset($this->_filters[0])){
+			foreach($this->_filters as $filter){
+				$query = call_user_func_array([$query, 'where'], $filter);
+			}
+		}
+		$results = $query->paginate($this->_pagenum);
+
+		foreach($results as $row){
 			foreach($this->_columns as $i=>$col){
+				$item['$id'] = $row[$this->_id_column];
 				$item[$i] = $col->key?$row[$col->key]:'';
 				if($col->modifier){
 					$item[$i] = call_user_func_array($col->modifier, [$item[$i], $row]);
@@ -139,7 +181,18 @@ class Finder{
 			}
 			$items[] = $item;
 		}
-		return $items;
+
+		$data = [
+			'count' => $results->count(),
+			'currentPage' => $results->currentPage(),
+			'hasMorePages' => $results->hasMorePages(),
+			'lastPage' => $results->lastPage(),
+			'perPage' => $results->perPage(),
+			'total' => $results->total(),
+			'items' => $items,
+		];
+
+		return $data;
 	}
 
 	public function cols(){
@@ -150,13 +203,33 @@ class Finder{
 		return $this->_title;
 	}
 
-	public function view($view = null){
+	public function view($view = null, $vars=[]){
 		$request = request();
-		switch($request->get('finder_request')){
-			case 'detail':
-				return call_user_func_array($this->_infoPanels[$request->get('panel_id')]->handle, [$request]);
+
+		$this->_current_sort_id = $request->get('sort', 0);
+		$this->_current_tab_id = $request->get('tab_id', 0);
+
+		if($filters = $request->get('filters')){
+			$this->_filters = Search::parse_filters($this->_searchs, $filters);
 		}
-		return view($view?:'admin::finder', ['finder'=>$this]);
+
+		if(!isset($this->_tabs[0])){
+			$this->addTab('全部', []);
+		}
+		switch($request->get('finder_request')){
+			case 'batch_action':
+				return call_user_func_array($this->_batch_actions[$request->get('action_id')]->handle, 
+					[$request->get('id')]);
+			case 'action':
+				return call_user_func_array($this->_actions[$request->get('id')]->handle, []);
+			case 'detail':
+				return call_user_func_array($this->_infoPanels[$request->get('panel_id')]->handle, 
+					[$request->get('item_id')]);
+			case 'data':
+				return $this->items();
+		}
+		$vars['finder'] = $this;
+		return view($view?:'admin::finder', $vars);
 	}
 
 	public function json(){
@@ -165,24 +238,34 @@ class Finder{
 			'title' => $this->_title,
 			'tabs' => $this->_tabs,
 			'cols' => $this->_columns,
+			'sorts' => $this->_sorts,
 			'infoPanels' => $this->_infoPanels,
-			'actions' => [],
-			'batchActions' => [],
+			'actions' => $this->_actions,
+			'searchs' => $this->_searchs,
+			'batchActions' => $this->_batch_actions,
+			'data' => $this->items(),
+			'tab_id' => $this->_current_tab_id,
+			'sort_id' => $this->_current_sort_id,
 		];
-		foreach($this->_actions as $act){
-			$ret['actions'][] = [
-					'label'=>$act->label,
-					'url'=>$act->url,
-				];
-		}
-		foreach($this->_batch_actions as $act){
-			$ret['batchActions'][] = [
-					'label'=>$act->label,
-					'url'=>$act->url,
-				];
-		}
 
-		$ret['items'] = $this->items();
+		foreach($ret as &$item){
+			if(is_array($item) && isset($item[0]) && is_object($item[0]) && 
+				property_exists($item[0], 'hidden') && is_array($item[0]->hidden)){
+				foreach($item as &$value){
+					$new_value = [];
+
+					$hidden = array_flip($value->hidden);
+					$hidden['hidden'] = true;
+
+					foreach(get_object_vars($value) as $k=>$v){
+						if(!isset($hidden[$k])){
+							$new_value[$k] = $v;
+						}
+					}
+					$value = $new_value;
+				}
+			}
+		}
 
 		return json_encode($ret, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 	}

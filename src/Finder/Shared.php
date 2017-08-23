@@ -15,8 +15,10 @@ trait Shared{
 		}elseif(property_exists($this, $method)){
 			$this->$method = $args[0];
 			return $this;
-		}else{
+		}elseif(is_callable([$this->_finder, $method])){
 			return call_user_func_array([$this->_finder, $method], $args);
+		}else{
+			trigger_error('Call to undefined method '.__CLASS__.'::'.$method.'()', E_USER_ERROR);
 		}
 	}
 }

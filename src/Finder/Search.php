@@ -1,0 +1,87 @@
+<?php
+namespace Shopex\LubanAdmin\Finder;
+
+class Search{
+	
+	use Shared;
+
+	public $key;
+	public $label;
+	public $optionType;
+	public $mode;
+	public $value;
+
+	public $hidden = ['key', 'optionType'];
+
+	static public function parse_filters(&$searchs, $filters){
+		foreach(json_decode($filters) as $item){
+			$i = $item[0];
+			$value = $item[1];
+			$mode = isset($item[2])?$item[2]:'=';
+
+			$key = $searchs[$i]->key;
+			$searchs[$i]->mode = $mode;
+			$searchs[$i]->value = $value;
+			switch($searchs[$i]->type){
+				case 'string':
+					switch($mode){
+						case '=':
+						$mode = '=';
+						break;
+
+						case '!=':
+						$mode = '!=';
+						break;
+
+						case 'begin':
+						$mode = 'like';
+						$value = $value.'%';
+						break;
+
+						case 'has':
+						$mode = 'like';
+						$value = '%'.$value.'%';
+						break;
+
+						case 'not like':
+						$mode = 'not like';
+						$value = '%'.$value;
+						break;
+
+						case 'not_has':
+						$mode = 'not like';
+						$value = '%'.$value.'%';
+						break;
+					}
+					break;
+
+				case 'number':
+					switch($mode){
+						case '=':
+						$mode = '=';
+						break;
+
+						case '!=':
+						$mode = '!=';
+						break;
+
+						case 'gt':
+						$mode = '>';
+						break;
+
+						case 'lt':
+						$mode = '<';
+						break;
+					}
+					break;
+				default:
+					$mode = '=';
+			}
+			if($value){
+				$return[] = [$key, $mode, $value];
+			}
+		}
+
+		return $return;
+	}
+}

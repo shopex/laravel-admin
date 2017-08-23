@@ -1,12 +1,12 @@
 <?php
 namespace Shopex\LubanAdmin\Finder;
 
-class InfoPanel{
+class Sort{
 	
 	use Shared;
 
-	public $handle;
+	public $orderBy = [];
 	public $label;
 
-	public $hidden = ['handle'];
+	public $hidden = ['orderBy'];
 }
