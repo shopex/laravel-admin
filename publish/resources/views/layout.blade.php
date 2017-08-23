@@ -21,7 +21,9 @@
 
 			@if (Auth::guest())
 			<div class="admin-header-content">
-				<a href="{{ url('/login') }}" type="button" class="btn btn-default external">登陆系统</a>
+				<div>
+					<a href="{{ url('/login') }}" type="button" class="btn btn-default external">登陆系统</a>
+				</div>
 			</div>
 			@else
 
@@ -93,13 +95,6 @@
 
 		</div>
 
-		@if (Auth::guest())
-		<div class="admin-main">
-			<div class="container main-content">
-				@yield('content')
-			</div>
-		</div>
-		@else
     	<div class="admin-main">
 	    	<div class="admin-sidebar">
 
@@ -167,7 +162,6 @@
 				@endif
 			</div>
 	    </div>
-	    @endif
 
     </div>
 

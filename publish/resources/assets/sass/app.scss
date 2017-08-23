@@ -94,7 +94,6 @@
 }
 .main-header{
 	flex: 0 0 auto;
-	overflow-x:hidden;
 	border-bottom: 1px solid #ccc;
 }
 .main-body{
@@ -158,5 +157,7 @@
 	height:3px;
 	background: #090;
 }
-
+li > a{
+	cursor: default;
+}
 @import './finder.scss';
