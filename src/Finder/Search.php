@@ -8,7 +8,7 @@ class Search{
 	public $key;
 	public $label;
 	public $optionType;
-	public $mode;
+	public $mode = '=';
 	public $value;
 
 	public $hidden = ['key', 'optionType'];

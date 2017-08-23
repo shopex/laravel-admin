@@ -110,8 +110,6 @@
 		  </div>
 		</div>
 
-		@yield('finder-search')
-
 	</form>
 
 	<div class="finder-workdesk-bar" v-if="'workdesk'==finder.tab_id">
