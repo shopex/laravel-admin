@@ -21,7 +21,6 @@
         "illuminate/support": "^5.1",
         "shopex/luban-crud-generator": "^2.1",
         "laravelcollective/html": "~5.1",
-        "guzzlehttp/guzzle": "^6.3"   
     },
     "autoload": {
         "psr-4": {
