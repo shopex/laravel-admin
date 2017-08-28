@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Route;
 class Admin{
 
 	public function routes(){
-		Auth::routes();
 		Route::get('admin', 'Admin\\AdminController@index');
 		Route::get('admin/give-role-permissions', 'Admin\\AdminController@getGiveRolePermissions');
 		Route::post('admin/give-role-permissions', 'Admin\\AdminController@postGiveRolePermissions');

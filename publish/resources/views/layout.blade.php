@@ -75,9 +75,9 @@
                     </a>  
                     <ul class="dropdown-menu-right dropdown-menu" role="menu">
                         <li>
-		                    <a href="{{ Luban::config()->get('sso_url') }}/profile" target="_blank" class="external">
+		                    <a href="{{ url('/profile') }}" target="_blank" class="external">
 		                        帐号设置
-		                    </a>                        
+		                    </a>
                             <a href="{{ url('/logout') }}"
                                 onclick="event.preventDefault();
                                          document.getElementById('logout-form').submit();">

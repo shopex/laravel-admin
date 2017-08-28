@@ -1,5 +1,3 @@
-require('jquery-airload');
-
 $.showIndicator = function() {
     $('#indicator').show();
 }
