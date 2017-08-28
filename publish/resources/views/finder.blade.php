@@ -169,7 +169,7 @@
 		已选择: @{{selected.length}}项
 		</span>
 
-		<form v-bind:target="batch_action_target" method="POST">
+		<form v-bind:target="batch_action_target" method="GET">
 			<input type="hidden" name="finder_request" value="batch_action" />
 			<input type="hidden" name="action_id" v-bind:value="batch_action_id" />
 			<input type="hidden" name="id[]" v-bind:value="id" v-for="id in selected" />
@@ -246,6 +246,7 @@ $(function(){
 			var that = this;
 			$.ajax({
 				'url': this.finder.baseUrl,
+				'method':'GET',
 				'data': {
 					'finder_request':'data', 
 					'page': page, 
@@ -352,6 +353,7 @@ $(function(){
 				var that = this;
 				$.ajax({
 					'url': this.finder.baseUrl,
+					'method':'GET',
 					'data': {
 						'finder_request':'detail', 
 						'panel_id': panel_id, 
