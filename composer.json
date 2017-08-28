@@ -18,9 +18,9 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/support": "^5.1",
+        "illuminate/support": "^5.4",
         "shopex/luban-crud-generator": "^2.1",
-        "laravelcollective/html": "~5.1",
+        "laravelcollective/html": "~5.4"
     },
     "autoload": {
         "psr-4": {
