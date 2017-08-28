@@ -26,7 +26,7 @@ class Finder{
 	private $_current_tab_id = 0;
 	private $_id_column = '';
 
-	static function new($model, $title){
+	static function create($model, $title){
 		$finder = new Finder;
 		$currentRouter = Route::getFacadeRoot()->current();
 		if(false == in_array('POST', $currentRouter->methods())){
