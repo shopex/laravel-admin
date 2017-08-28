@@ -32,10 +32,15 @@ resources/assets/sass/app.scss 下增加
     @import "../vendor/admin/sass/app";
 ```
 
+生成vendor提供的文件
+```
 php artisan vendor:publish
 php artisan make:auth
+```
 
+编译js/css,  运行程序.
+```
 npm run dev
-
 php artisan migrate
 php artisan serve
+```
