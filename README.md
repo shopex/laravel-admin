@@ -7,6 +7,12 @@ cd admin
 composer require shopex/luban-admin
 ```
 
+生成vendor提供的文件
+```
+php artisan vendor:publish
+php artisan make:auth
+```
+
 config/app.config 下增加
 
 ```        
@@ -32,11 +38,17 @@ resources/assets/sass/app.scss 下增加
     @import "../vendor/admin/sass/app";
 ```
 
-生成vendor提供的文件
+routes/web.php
 ```
-php artisan vendor:publish
-php artisan make:auth
+Admin::routes();
+Route::get('/profile', function(){
+	return 'profile';
+})->middleware('auth');
+Route::get('/admin-site-menus', function(){
+	return [];
+})->middleware('auth');
 ```
+
 
 编译js/css,  运行程序.
 ```
