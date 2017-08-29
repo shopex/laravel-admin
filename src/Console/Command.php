@@ -7,7 +7,7 @@ use Response;
 class Command {
 
 	static function register(){
-		Artisan::command('admin:publish', function () {
+		Artisan::command('admin:publish {file?}', function () {
 			$commandArg = ['--provider' => 'Shopex\LubanAdmin\Providers\LubanAdminProvider', 
 				'--tag' => 'resources',
 				'--force' => true];

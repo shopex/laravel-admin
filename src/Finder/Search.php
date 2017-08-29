@@ -14,6 +14,7 @@ class Search{
 	public $hidden = ['key', 'optionType'];
 
 	static public function parse_filters(&$searchs, $filters){
+		$return = [];
 		foreach(json_decode($filters) as $item){
 			$i = $item[0];
 			$value = $item[1];

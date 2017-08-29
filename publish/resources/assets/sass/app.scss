@@ -2,31 +2,14 @@
 	position: relative;
 	overflow: hidden;
 }
-.app-sel{
-	width:22rem;
-	margin:0;
-	padding:1rem;
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
-.app-sel li{
-	float:left;
-	margin:0.5rem 0;
-}
-.app-sel li a{
-	text-align: center;
-	display: block;
-}
-.app-sel img{
-	width:3rem;
-	height:3rem;
-}
-
-.search-form{position: relative}
-.search-form .dropdown-menu{display:none;}
-.search-opts{min-height:190px;}
-.search-opts a{display: block;padding:5px 10px; text-decoration: none; color:#666;}
-.search-opts a:hover{background: $component-active-bg; color:$component-active-color;}
-.search-panel-footer{border-top:1px solid #ccc; margin:0 10px; padding:10px 0 5px 0; text-align: right}
-
 .admin-page{
 	position: absolute;
 	top:0;
@@ -67,13 +50,6 @@
 }
 .admin-header-content .dropdown.open>a{
 	background: #f0f0f0;
-}
-.admin-header-searchbar input{
-	line-height: 2.4rem;
-	margin:1.3rem 0;
-	padding:0 0.5rem;
-	background: transparent;
-	border:1px solid #ccc;
 }
 .admin-main{
 	flex:99;
@@ -160,4 +136,3 @@
 li > a{
 	cursor: default;
 }
-@import './finder.scss';

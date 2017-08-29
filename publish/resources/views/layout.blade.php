@@ -12,8 +12,8 @@
   </head>
 
 <body>
-	<div class="admin-page">
-		<div class="admin-header" id="app-header">
+	<div class="admin-page" id="app">
+		<div class="admin-header">
 
 			<div class="admin-header-title">
 				<img class="appbanner" src="{{ url('/appbanner.png') }}" />
@@ -27,47 +27,13 @@
 			</div>
 			@else
 
-			<div class="admin-header-searchbar">
-		      <input type="text" />
-
-			  @if (false and isset($searchbar) and $searchbar)
-			  	<searchbar :items="searchbar"></searchbar>
-		      @endif      
-			</div>
+		  @if (isset($searchbar) and $searchbar)
+		  	<searchbar :items="searchbar"></searchbar>
+	      @endif
 
 			<div class="admin-header-content">
 
-				<span class="dropdown">
-				  <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				    <i class="glyphicon glyphicon-th"></i>
-				  </a>
-				  <ul class="dropdown-menu dropdown-menu-right app-sel">
-				    <li>
-					    <a href="#">
-					    	<img src="https://git.shopex.cn/img/favicon.png" width="48px" />
-					    	<div>CRM</div>
-					    </a>
-				    </li>
-				    <li>
-					    <a href="">
-					    	<img src="https://git.shopex.cn/img/favicon.png" width="48px" />
-					    	<div>CRM</div>
-					    </a>
-				    </li>
-				    <li>
-					    <a href="">
-					    	<img src="https://git.shopex.cn/img/favicon.png" width="48px" />
-					    	<div>CRM</div>
-					    </a>
-				    </li>
-				    <li>
-					    <a href="">
-					    	<img src="https://git.shopex.cn/img/favicon.png" width="48px" />
-					    	<div>CRM</div>
-					    </a>
-				    </li>
-				  </ul>
-				</span>
+			<appsel :appinfo_url="appinfo_url"></appsel>
 
                 <span class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -75,9 +41,9 @@
                     </a>  
                     <ul class="dropdown-menu-right dropdown-menu" role="menu">
                         <li>
-		                    <a href="{{ url('/profile') }}" target="_blank" class="external">
+		                    <a href="{{ Luban::config()->get('sso_url') }}/profile" target="_blank" class="external">
 		                        帐号设置
-		                    </a>
+		                    </a>                        
                             <a href="{{ url('/logout') }}"
                                 onclick="event.preventDefault();
                                          document.getElementById('logout-form').submit();">
@@ -174,7 +140,6 @@
     		<div class="indicator-process"></div>
     	</div>
     </div>
-
     </body>
 
     <script>
@@ -185,9 +150,10 @@
     @endif;
 
   	var app = new Vue({ 
-  		el: '#app-header',
+  		el: '#app',
   		data: {
-  			searchbar: searchbar
+  			searchbar: searchbar,
+  			appinfo_url: "{{ url('/admin-site-menus') }}"
   		}
   	});
     </script>
