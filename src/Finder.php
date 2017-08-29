@@ -29,7 +29,7 @@ class Finder{
 	static function create($model, $title){
 		$finder = new Finder;
 		$currentRouter = Route::getFacadeRoot()->current();
-		if(false == in_array('POST', $currentRouter->methods())){
+		if(false == in_array('GET', $currentRouter->methods())){
 			throw new \Exception('使用Finder的路由必须支持POST.');
 		}
 		$currentPath= $currentRouter->uri();

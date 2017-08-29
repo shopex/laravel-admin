@@ -63,48 +63,7 @@
 
     	<div class="admin-main">
 	    	<div class="admin-sidebar">
-
-		      <ul>
-		      	@foreach ($app_menus as $menu)
-
-		  		@if (Auth::guest())
-		  			@if (isset($menu['user-only']) and $menu['user-only'])
-		  				@continue;
-		  			@endif
-		  		@else
-		  			@if (isset($menu['guest-only']) and $menu['guest-only'])
-		  				@continue;
-		  			@endif
-		  		@endif
-
-		      	@if (isset($menu['items']) and count($menu['items']) > 0)
-		        <li>
-		          <a>{{$menu['label']}} <span class="caret"></span></a>
-		          <ul>
-		          	@foreach ($menu['items'] as $item)
-			          	@if (isset($item['label']))
-				          	<li>
-				          	<a href="{{ url($item['link']) }}">
-				          	@if (isset($item['icon']))
-				          	<i class="glyphicon {{ $item['icon'] }}"></i>
-				          	@else
-				          	<i style="display:inline-block;width:1em"></i>
-				          	@endif
-				          	{{$item['label']}}
-				          	</a>
-				          	</li>
-			          	@else
-				          	<li role="separator" class="divider"></li>
-			          	@endif
-		          	@endforeach
-		          </ul>
-		        </li>
-		      	@else	        
-				<li><a href="{{ url($menu['link']) }}">{{$menu['label']}}</a></li>	        
-		        @endif
-				@endforeach
-		      </ul>
-
+	    		<appmenu :menus="menus"></appmenu>
 			</div>
 
 			<div class="main-content">
@@ -153,7 +112,8 @@
   		el: '#app',
   		data: {
   			searchbar: searchbar,
-  			appinfo_url: "{{ url('/admin-site-menus') }}"
+  			appinfo_url: "{{ url('/admin-site-menus') }}",
+  			menus: {!! json_encode($app_menus) !!}
   		}
   	});
     </script>
