@@ -151,9 +151,7 @@
 			<transition name="finder-slide-bottom">
 				<div class="finder-batch-action-bar" v-if="selected.length>0">
 					<div>
-						<span>
-						已选择: {{selected.length}}项
-						</span>
+						<span>{{selected.length}}</span>
 
 						<form v-bind:target="batch_action_target" method="POST">
 							<input type="hidden" name="finder_request" value="batch_action" />
@@ -167,9 +165,10 @@
 										class="btn btn-default">
 										{{action.label}}
 								</button>
-								<button v-if="'workdesk'==finder.tab_id" v-on:click="del_workdesk($event)" class="btn btn-default">移出操作台</button>
-								<button v-else v-on:click="put_workdesk($event)" class="btn btn-default">放入操作台</button>
 							</div>
+							
+							<button v-if="'workdesk'==finder.tab_id" v-on:click="del_workdesk($event)" class="btn btn-default">移出操作台</button>
+							<button v-else v-on:click="put_workdesk($event)" class="btn btn-default">放入操作台</button>
 						</form>
 					</div>
 				</div>
@@ -267,13 +266,28 @@
 }
 .finder-batch-action-bar>div{
 	border:1px solid #ccc;
-	padding:1rem;
-	background: #000;
-	color: #ccc;
+	padding:1.5rem .5rem .5rem .5rem;
 	z-index: 999;
 	border-top-left-radius: 1rem;
 	border-top-right-radius: 1rem;
 	border-bottom: none;
+	background: #000;
+	color: #ccc;	
+}
+.finder-batch-action-bar>div span{
+	border:0.5rem solid #000;	
+	background: #666;
+	color: #ccc;
+	position: absolute;
+	height:4rem;
+	width:4rem;
+	text-align: center;
+	display: block;
+	top: -2.5rem;
+	border-radius: 100%;
+	line-height: 3rem;
+	left: 50%;
+	margin-left: -2rem;
 }
 .finder-batch-action-bar .btn-default{
 	background: #000;
