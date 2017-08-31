@@ -3,6 +3,11 @@
 @section('title', 'Generator')
 
 @section('content')
+<div class="finder-preview">
+    <div class="finder-action-bar"></div>
+    <div class="finder-header"></div>
+</div>
+
     <div class="container">
         <div class="row">
 
@@ -130,5 +135,187 @@
             });
 
         });
+
+
+$(function(){
+    var Finder = Vue.component("finder");
+    var component = new Finder({
+        data: {
+            finder: {
+                "baseUrl": "\/home",
+                "title": "标题",
+                "tabs": [
+                    {
+                        "label": "低优先级"
+                    },
+                    {
+                        "label": "高优先级"
+                    },
+                    {
+                        "label": "考试不及格"
+                    }
+                ],
+                "cols": [
+                    {
+                        "key": "name",
+                        "label": "姓名",
+                        "sortAble": null,
+                        "default": null,
+                        "size": 2,
+                        "className": null,
+                        "html": false
+                    },
+                    {
+                        "key": "name",
+                        "label": "姓名",
+                        "sortAble": null,
+                        "default": null,
+                        "size": 2,
+                        "className": null,
+                        "html": true
+                    },
+                    {
+                        "key": "email",
+                        "label": "邮箱",
+                        "sortAble": null,
+                        "default": null,
+                        "size": 6,
+                        "className": null,
+                        "html": false
+                    },
+                    {
+                        "key": "created_at",
+                        "label": "创建时间",
+                        "sortAble": null,
+                        "default": null,
+                        "size": 2,
+                        "className": null,
+                        "html": false
+                    }
+                ],
+                "sorts": [
+                    {
+                        "label": "按修改时间倒排"
+                    },
+                    {
+                        "label": "按修改时间正排"
+                    }
+                ],
+                "infoPanels": [
+                    {
+                        "label": "家庭地址"
+                    }
+                ],
+                "actions": [
+                    {
+                        "label": "旋转",
+                        "url": null,
+                        "target": "_blank"
+                    },
+                    {
+                        "label": "跳跃",
+                        "url": null,
+                        "target": "#modal-normal"
+                    },
+                    {
+                        "label": "奔跑",
+                        "url": null,
+                        "target": "#modal-small"
+                    },
+                    {
+                        "label": "卧倒",
+                        "url": null,
+                        "target": "#modal-large"
+                    },
+                    {
+                        "label": "打滚",
+                        "url": null,
+                        "target": null
+                    }
+                ],
+                "searchs": [
+                    {
+                        "label": "姓名",
+                        "mode": "=",
+                        "value": null,
+                        "type": "string"
+                    },
+                    {
+                        "label": "邮箱",
+                        "mode": "=",
+                        "value": null,
+                        "type": "string"
+                    },
+                    {
+                        "label": "年龄",
+                        "mode": "=",
+                        "value": null,
+                        "type": "number"
+                    },
+                    {
+                        "label": "邮箱",
+                        "mode": "=",
+                        "value": null,
+                        "type": {}
+                    }
+                ],
+                "batchActions": [
+                    {
+                        "label": "批量操作1",
+                        "url": null,
+                        "target": "_blank"
+                    },
+                    {
+                        "label": "批量操作2",
+                        "url": null,
+                        "target": null
+                    }
+                ],
+                "data": {
+                    "count": 2,
+                    "currentPage": 1,
+                    "hasMorePages": false,
+                    "lastPage": 1,
+                    "perPage": 20,
+                    "total": 2,
+                    "items": [
+                        {
+                            "$id": 2,
+                            "0": "WANGLEI",
+                            "1": "<a href=\"asdf\">asdfs<\/a>",
+                            "2": "flaboy.cn@gmail.com",
+                            "3": {
+                                "date": "2017-08-21 06:18:11.000000",
+                                "timezone_type": 3,
+                                "timezone": "UTC"
+                            }
+                        },
+                        {
+                            "$id": 1,
+                            "0": "WANGLEI",
+                            "1": "<a href=\"asdf\">asdfs<\/a>",
+                            "2": "flaboy.cn@gmail.com",
+                            "3": {
+                                "date": "2017-08-18 02:51:10.000000",
+                                "timezone_type": 3,
+                                "timezone": "UTC"
+                            }
+                        }
+                    ]
+                },
+                "tab_id": 0,
+                "sort_id": 0
+            }
+        }
+    }).$mount();
+
+    $('.finder-preview .finder-action-bar').replaceWith(component.$refs.actionbar);
+    $('.finder-preview .finder-header').replaceWith(component.$refs.header);
+
+    component.finder.tabs = [
+            {"label": "aasdf"},
+            {"label": "bbbbb"}
+    ];
+})
     </script>
 @endsection

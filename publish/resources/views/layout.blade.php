@@ -69,9 +69,13 @@
 			<div class="main-content">
 				<div class="main-header">
 					<div class="main-header-basic">
-						<ol class="breadcrumb">
-						  <li class="active">@yield('title')</li>
-						</ol>
+          @if (array_key_exists('navpath', View::getSections()))
+            @yield('navpath')
+          @else
+            <ol class="breadcrumb">
+              <li class="active">@yield('title')</li>
+            </ol>          
+          @endif
 						<div class="main-header-action">
 							@yield('action-bar')
 						</div>

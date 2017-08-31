@@ -1,0 +1,121 @@
+.main-content{
+	position: relative;
+	overflow: hidden;
+}
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.admin-page{
+	position: absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	display: flex;
+	flex-direction: column;
+}
+.admin-header{
+	flex:1;
+	min-height: 5rem; 
+	display: flex; 
+	line-height: 5rem;
+	background: #fff;
+	border-bottom: 1px solid #ccc;
+}
+.admin-header-title{
+	flex:20rem 0;
+	padding-left: 1rem;
+}
+.admin-header-searchbar{
+	flex:1 1;
+}
+.admin-header-content{
+	flex:1 0;
+	padding-right: 1rem;
+	display: flex;
+	justify-content: flex-end;
+}
+.admin-header-content .dropdown>a{
+	display: block;
+	padding: 0 1rem;
+	width:100%;
+	height:100%;
+	color: #666;
+	text-decoration: none;
+}
+.admin-header-content .dropdown.open>a{
+	background: #f0f0f0;
+}
+.admin-main{
+	flex:99;
+	overflow: auto;
+	display: flex; 
+	background: #fff;
+}
+.admin-sidebar{
+	flex:20rem 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	border-right:1px solid #ccc;
+}
+.main-content{
+	flex:1;
+	flex-direction: column;
+	display: flex;
+}
+.main-header{
+	flex: 0 0 auto;
+	border-bottom: 1px solid #ccc;
+}
+.main-body{
+	flex: 1 1 auto;
+	overflow-y: auto;
+	overflow-x:hidden;
+}
+.main-footer{
+	flex: 0 0 auto;
+	border-top: 1px solid #ccc;
+	overflow-x:hidden;
+}
+.main-body>.container{
+	padding: 1rem;
+}
+.appbanner{
+	height:3rem;
+	margin:1rem;
+}
+.main-header .main-header-basic{
+	display: flex;
+}
+.main-header .breadcrumb{
+	flex:1 0 auto;
+	min-width: 10rem;
+}
+.main-header .main-header-action{
+	flex:50;
+	padding: 0.5rem;
+}    
+.main-header .breadcrumb{
+	font-weight: bold;
+	line-height: 4rem;
+	margin:0;
+	padding:0 0 0 0.5rem;
+	background: transparent;
+}
+#indicator{
+	position: absolute;
+	left:0;
+	top:0;
+	z-index: 9999;
+	right:0;
+	height:3px;
+	background: #090;
+}
+li > a{
+	cursor: default;
+}
