@@ -6,8 +6,7 @@
 						<a v-for="(action, idx) in finder.actions" 
 							class="btn btn-default" 
 							v-bind:href="action_url[idx]"
-							v-bind:target="action.target"
-							v-on:click="go_action(idx, $event)">
+							v-bind:target="action.target">
 							{{action.label}}
 						</a>
 					</div>
