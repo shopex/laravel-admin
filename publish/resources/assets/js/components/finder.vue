@@ -154,12 +154,13 @@
 
 						<form v-bind:target="batch_action_target" method="POST">
 							<input type="hidden" name="finder_request" value="batch_action" />
+							<input type="hidden" name="_token" v-bind:value="csrf_token">
 							<input type="hidden" name="action_id" v-bind:value="batch_action_id" />
 							<input type="hidden" name="id[]" v-bind:value="id" v-for="id in selected" />
 
 							<div class="btn-group" role="group">
 								<button v-for="(action, idx) in finder.batchActions"
-										v-on:click="batch_action_id=idx;batch_action_target=action.target"
+										v-on:click="submit(idx, action.target)"
 										type="submit"
 										class="btn btn-default">
 										{{action.label}}
@@ -562,10 +563,16 @@ export default {
 				this.batch_select_lastidx = idx;
 				this.unselectable = true;
 			}
+		},
+		submit (idx, target){
+			this.batch_action_id = idx;
+			this.batch_action_target = target;
+			this.csrf_token = $('meta[name="csrf-token"]').attr('content');
 		}
 	  },
 	  data (){
 	  	return {
+	  		csrf_token: '',
 		    current_detail: undefined,
 		    current_panel: 0,
 		    checkbox: [],
