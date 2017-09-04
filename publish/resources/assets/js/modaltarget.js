@@ -70,6 +70,7 @@ $(function(){
 			e.stopPropagation();
 	        e.preventDefault();	
 
+			modal.title = el.attr('data-modal-title');
 	        $.ajax({
 	        	url: href,
 	            method: el.attr('method'),
@@ -95,6 +96,7 @@ $(function(){
 	      if(modal){
 			e.stopPropagation();
 	        e.preventDefault();
+	      	modal.title = el.attr('data-modal-title');
 
 	        $.ajax({
 	        	url: href
