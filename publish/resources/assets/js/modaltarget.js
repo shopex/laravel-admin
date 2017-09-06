@@ -1,56 +1,97 @@
 $(function(){
-	var loadPage = function(){
+	var getComponent = function(){
+		if(window._modal_component){
+			var component = window._modal_component;
+		}else{
+			var Modal = Vue.component("modal");
+			var component = new Modal().$mount();
+			$(document.body).append(component.$el);
+			window._modal_component = component;
+		}
 
-	};
+		$(component.$el).on('hidden.bs.modal', function (e) {
+		  window._modal_component = undefined;
+		  $(component.$el).remove();
+		})
 
-	var getModal = function(target){
+		$(component.$el).modal({});
+		return component;
+	}
+
+	var getModal = function(el, ev, func){
 		try{
-			var modal = false;
-			var size = 'normal';
+			var next = function(){
+				var target = el.attr('target');			
+				var modal = false;
+				var size = 'normal';
 
-			if(target=='#modal-normal'){
-				modal = true;
-			}else if(target=='#modal'){
-				modal = true;
-			}else if(target=='#modal-large'){
-				modal = true;
-				size = 'large';
-			}else if(target=='#modal-small'){
-				modal = true;
-				size = 'small';
-			}
-
-			if(modal){
-
-				if(window._modal_component){
-					var component = window._modal_component;
-				}else{
-					var Modal = Vue.component("modal");
-					var component = new Modal().$mount();
-					$(document.body).append(component.$el);
-					window._modal_component = component;
+				if(target=='#modal-normal'){
+					modal = true;
+				}else if(target=='#modal'){
+					modal = true;
+				}else if(target=='#modal-large'){
+					modal = true;
+					size = 'large';
+				}else if(target=='#modal-small'){
+					modal = true;
+					size = 'small';
 				}
 
-				if(size=='large'){
-					component.large = true;
-				}else if(size=='small'){
-					component.small = true;
+				if(modal){
+					var component = getComponent();
+					if(size=='large'){
+						component.large = true;
+					}else if(size=='small'){
+						component.small = true;
+					}
+					component.loading = true;
+					component.minH = '40vh';
+					ev.stopPropagation();
+			        ev.preventDefault();
+					func(component);
+					return true;
 				}
-				component.loading = true;
-
-				$(component.$el).on('hidden.bs.modal', function (e) {
-				  window._modal_component = undefined;
-				  $(component.$el).remove();
-				})
-
-				$(component.$el).modal({});
-				return component;
+				return false;
 			}
 
-			return false;
+			var confirm = el.attr('data-modal-confirm');
+			console.info(el, confirm);
+			if(confirm && !ev.originalEvent.confirmed){
+				var win = getComponent();
+				win.confirmMode = true;
+				$(win.$refs.body).html('<h3 style="text-align:center">'+confirm+'</h3>');
+				ev.stopPropagation();
+		        ev.preventDefault();
+
+		        $(win.$el).on('confirm', function(newEv){
+					newEv.stopPropagation();
+
+		        	$(win.$el).modal('hide');
+		        	var processed = next();
+		        	if(!processed){
+						var event;
+						if (document.createEvent) {
+							event = document.createEvent("HTMLEvents");
+							event.initEvent(ev.type, true, true);
+						} else {
+							event = document.createEventObject();
+							event.eventType = ev.type;
+						}
+
+						event.confirmed = true;
+
+						if (document.createEvent) {
+							el[0].dispatchEvent(event);
+						} else {
+							el[0].fireEvent("on" + event.eventType, event);
+						}
+		        	}
+		        })
+			}else{
+				next();
+			}
 		}catch(error){
-			console.info(error);
-			return true;
+			console.error(error);
 		}
 	}
 
@@ -65,11 +106,7 @@ $(function(){
 	        }
 	      }
 	      el = $(el);
-	      var modal = getModal(el.attr('target'));
-	      if(modal){
-			e.stopPropagation();
-	        e.preventDefault();	
-
+	      getModal(el, e, function(modal){
 			modal.title = el.attr('data-modal-title');
 	        $.ajax({
 	        	url: href,
@@ -79,7 +116,7 @@ $(function(){
 	        	modal.loading = false;
 	        	$(modal.$refs.body).html(ret);
 	        });
-	      }
+	      });
 	  });
 
 	  $(el).bind('click', function(e){
@@ -92,19 +129,16 @@ $(function(){
 	      }
 	      el = $(el);
 	      var href = el.attr('href');
-	      var modal = getModal(el.attr('target'));
-	      if(modal){
-			e.stopPropagation();
-	        e.preventDefault();
-	      	modal.title = el.attr('data-modal-title');
+	      var modal = getModal(el, e, function(modal){
+		      	modal.title = el.attr('data-modal-title');
 
-	        $.ajax({
-	        	url: href
-	        }).done(function(ret){
-	        	modal.loading = false;
-	        	$(modal.$refs.body).html(ret);
-	        });
-	      }
+		        $.ajax({
+		        	url: href
+		        }).done(function(ret){
+		        	modal.loading = false;
+		        	$(modal.$refs.body).html(ret);
+		        });
+	      });
 	  });
 	}
 

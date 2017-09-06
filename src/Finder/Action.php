@@ -9,7 +9,7 @@ class Action{
 	public $handle;
 	public $url;
 	public $target;
-
+	public $confirm;
 	public $hidden = ['handle'];
 
 	function newWindow(){

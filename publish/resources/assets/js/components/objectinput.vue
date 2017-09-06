@@ -1,20 +1,15 @@
 <template>
-	<div class="object-input">
-		  <div class="outter" @click="open" v-bind:class="{multiple: is_multiple}">
-
-			  <i class="handle glyphicon glyphicon-search"></i>
-
+	<a href="#" class="outter" @click="open($event)" v-bind:class="{multiple: is_multiple}">
 			<transition-group name="fade" v-if="first_loaded">
 			  <span class="label" 
 			  		v-bind:class="{'label-primary':!item.remove, 'label-danger':item.remove}"
 			  		v-bind:key="item.value"
 			  		v-for="(item, i) in values">
 					{{item.label}}
-					<i v-if="is_multiple" 
-					@mouseover="$set(item,'remove',true)"
-					@mouseout="$set(item,'remove',false)"
-					@click="remove(i,$event)"
-					class="glyphicon glyphicon-remove"></i>
+					<i  @mouseover="$set(item,'remove',true)"
+						@mouseout="$set(item,'remove',false)"
+						@click="remove(i,$event)"
+						class="glyphicon glyphicon-remove"></i>
 			  </span>
 			  </transition-group>
 	      		<div class="loading" v-else>
@@ -24,12 +19,6 @@
 				</div>
 
 			  <input type="hidden" :name="name" :value="return_value" />
-
-	      </div>
-
-		  <div class="dropdown-menu">
-		  	<div ref="finderContainer"></div>
-		  </div>
 
 		<div class="modal" tabindex="-1" role="dialog" ref="modal">
 		  <div class="modal-dialog modal-lg" role="document">
@@ -59,23 +48,29 @@
 		  </div>
 		</div>
 
-	</div>
+	</a>
 </template>
 
 <style scoped>
-.object-input{
-	display: inline-block;
-}
 .outter{
-	border-bottom:1px solid #ccc; 
+	display: inline-block;
+	border:1px solid #ccc; 
 	min-width:20rem;
-	padding: 0.3rem 3rem 0.3rem 0.3rem;
+	min-height:2.8rem;
 	cursor: pointer;
 	white-space: normal;
+	line-height: 1.5rem;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	padding-left:5px;
+}
+.outter:hover{
+	text-decoration: none;	
 }
 .outter .label{
 	cursor: default;
-	margin-right:5px;
+	margin:5px 0 5px 5px;
 	display: inline-block;
 }
 .outter .label>.glyphicon{
@@ -130,7 +125,6 @@ export default {
 		if(this.value){
 			this.sync();
 		}
-		$(document.body).append(this.$refs.modal);	
 	},
 	computed: {
 		return_value(){
@@ -155,11 +149,14 @@ export default {
 		}
 	},
 	methods: {
-		open(){
+		open(ev){
+			ev.stopPropagation();
+			ev.preventDefault();
 			$(this.$refs.modal).modal({});
 		},
 		remove(i, ev){
 	      	ev.stopPropagation();
+	      	ev.preventDefault();
 			this.$delete(this.values, i);
 		},
 		sync(){
@@ -180,6 +177,7 @@ export default {
 				this.v_select_all = false;				
 				this.finder.reload();
 			}else if(!this.loading){
+				$(document.body).append(this.$refs.modal);
 				$.ajax({
 					url: this.baseurl,
 					complete (){

@@ -1,12 +1,12 @@
 <template>
-	<div class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal" tabindex="-1" role="dialog">
 	  <div class="modal-dialog" v-bind:class="{'modal-lg':large, 'modal-sm':small}" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	        <h4 class="modal-title">{{title}}</h4>
 	      </div>
-	      <div class="modal-body">
+	      <div class="modal-body" v-bind:style="{'min-height': minH}">
 	      	  <div ref="body"></div>
 		      <div class="loading-box" v-if="loading">
 				<div class="loading">
@@ -16,6 +16,10 @@
 				</div>
 			  </div>
 	      </div>
+	      <div v-if="confirmMode" class="modal-footer" style="text-align:center">
+	      	<button class="btn btn-default btn-lg" data-dismiss="modal">取消</button>
+	      	<button class="btn btn-default btn-lg" @click="confirm($event)">确定</button>
+	      </div>
 	    </div>
 	  </div>
 	</div>
@@ -23,7 +27,6 @@
 
 <style scoped>
 .modal-body{
-	min-height: 40vh;
 	position: relative;	
 }
 .loading-box{
@@ -42,6 +45,8 @@
 export default {
 	data() {
 		return {
+			minH: '20vh',
+			confirmMode: false,
 			title: "",
 			loading: false,
 			large: false,
@@ -51,6 +56,11 @@ export default {
 	methods: {
 		show (){
 			$(this.el).modal({});
+		},
+		confirm(ev){
+			ev.stopPropagation();
+	        ev.preventDefault();			
+			$(this.$el).trigger('confirm');
 		}
 	}
 }
