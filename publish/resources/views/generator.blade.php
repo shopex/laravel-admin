@@ -85,7 +85,7 @@
                             
                             </div>
                             <div class="form-group table-fields">
-                                <h4 class="text-center">表字段:</h4><br>
+                                <h4 class="text-center">表字段 <a target="__black" href="https://shimo.im/doc/RWHF4vw1eC87J0M3?r=MQLEYZ">建表规约</a></h4><br>
                                 <div class="entry col-md-12 col-md-offset-1 form-inline">
                                     <input class="form-control" name="fields[]" type="text" placeholder="字段名称" required="true">
                                     <input class="form-control" name="field_descs[]" type="text" placeholder="字段描述" required="true">
