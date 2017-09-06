@@ -11,20 +11,20 @@ use Illuminate\Support\Facades\Route;
 
 class Finder{
 
-	private $_title;
-	private $_model;
-	private $_baseUrl = '';
-	private $_tabs = [];
-	private $_actions = [];
-	private $_batch_actions = [];
-	private $_searchs = [];
-	private $_infoPanels = [];
-	private $_columns = [];
-	private $_sorts = [];
-	private $_pagenum = 20;
-	private $_current_sort_id = 0;
-	private $_current_tab_id = 0;
-	private $_id_column = '';
+	public $_title;
+	public $_model;
+	public $_baseUrl = '';
+	public $_tabs = [];
+	public $_actions = [];
+	public $_batch_actions = [];
+	public $_searchs = [];
+	public $_infoPanels = [];
+	public $_columns = [];
+	public $_sorts = [];
+	public $_pagenum = 20;
+	public $_current_sort_id = 0;
+	public $_current_tab_id = 0;
+	public $_id_column = '';
 
 	static function create($model, $title){
 		$finder = new Finder;
@@ -42,14 +42,21 @@ class Finder{
 
 	public function setTitle($title){
 		$this->_title = $title;
+		return $this;
 	}
 
 	public function setModel($model){
 		$this->model = $model;
+		return $this;
 	}
 
 	public function setBaseUrl($url){
 		$this->_baseUrl = $url;
+		return $this;
+	}
+
+	public function setPageNum($n){
+		$this->_pagenum = $n;
 		return $this;
 	}
 
@@ -232,7 +239,7 @@ class Finder{
 		return view($view?:'admin::finder', $vars);
 	}
 
-	public function json(){
+	public function data(){
 		$ret = [
 			'baseUrl' => $this->_baseUrl,
 			'title' => $this->_title,
@@ -248,7 +255,12 @@ class Finder{
 			'sort_id' => $this->_current_sort_id,
 		];
 
-		foreach($ret as &$item){
+		return $this->output_data($ret);
+	}
+
+	public function output_data($array){
+
+		foreach($array as &$item){
 			if(is_array($item) && isset($item[0]) && is_object($item[0]) && 
 				property_exists($item[0], 'hidden') && is_array($item[0]->hidden)){
 				foreach($item as &$value){
@@ -266,7 +278,12 @@ class Finder{
 				}
 			}
 		}
+		
+		return $array;
+	}
 
-		return json_encode($ret, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+	public function json(){
+		$data = $this->data();
+		return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 	}
 }

@@ -5,6 +5,7 @@ namespace Shopex\LubanAdmin\Providers;
 use File;
 use Illuminate\Support\ServiceProvider;
 use Shopex\LubanAdmin\Console\Command;
+use Shopex\LubanAdmin\Admin;
 
 class LubanAdminProvider extends ServiceProvider
 {

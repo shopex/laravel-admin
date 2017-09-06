@@ -6,6 +6,7 @@
 						<a v-for="(action, idx) in finder.actions" 
 							class="btn btn-default" 
 							v-bind:href="action_url[idx]"
+							v-bind:data-modal-title="action.label"
 							v-bind:target="action.target">
 							{{action.label}}
 						</a>
@@ -16,7 +17,7 @@
 					    <li v-for="(panel, tab_id) in finder.tabs" v-bind:class="{'active': tab_id==finder.tab_id}">
 					    	<a v-on:click="select_tab(tab_id)">{{panel.label}}</a>
 					    </li>
-						<li v-bind:class="{'active': 'workdesk'==finder.tab_id}">
+						<li v-bind:class="{'active': 'workdesk'==finder.tab_id}" v-if="!disable_workdesk">
 					    	<a v-on:click="select_tab('workdesk')">
 								<i class="glyphicon glyphicon-duplicate"></i>
 								<sup v-show="workdesk.length>0" style="background: red" class="badge">
@@ -26,7 +27,7 @@
 					    </li>
 					  </ul>
 				</div>
-				<div class="finder-pager">
+				<div class="finder-pager" v-if="finder.data" ref="pager">
 					<span class="dropdown">
 					  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true">
 					    {{(finder.data.currentPage-1)*finder.data.perPage+1}}
@@ -40,7 +41,7 @@
 						    	<i class="glyphicon glyphicon-ok" v-if="idx==finder.sort_id"></i>
 						    </a>
 					    </li>
-					    <li role="separator" class="divider"></li>
+					    <li v-if="finder.sorts && finder.sorts.length>0" role="separator" class="divider"></li>
 						<li v-for="(col, col_id) in finder.cols">
 							<a v-on:click="toggle_col(col_id)">
 								{{col.label}}
@@ -49,17 +50,17 @@
 						</li>
 					  </ul>
 					</span>
-					<button class="btn btn-default" v-on:click="go_page(-1)" v-bind:disabled="finder.data.currentPage==1">
+					<button class="btn btn-default" v-on:click="go_page(-1, $event)" v-bind:disabled="finder.data.currentPage==1">
 						<i class="glyphicon glyphicon-menu-left"></i>
 					</button>
-					<button class="btn btn-default" v-on:click="go_page(1)" v-bind:disabled="finder.data.hasMorePages==false">
+					<button class="btn btn-default" v-on:click="go_page(1, $event)" v-bind:disabled="finder.data.hasMorePages==false">
 						<i class="glyphicon glyphicon-menu-right"></i>
 					</button>
 				</div>
 			</div>
 
 			<div class="finder-header" ref="header">
-				<form class="finder-search-bar" v-on:submit="reload()" v-if="'workdesk'!=finder.tab_id && finder.searchs">
+				<form class="finder-search-bar" v-on:submit="reload()" v-if="'workdesk'!=finder.tab_id && finder.searchs && finder.searchs.length>0">
 
 					<div class="form-inline" v-for="(search, idx) in finder.searchs">
 					  <div class="form-group">
@@ -92,15 +93,18 @@
 					</div>
 				</form>
 
-				<div class="finder-workdesk-bar" v-if="'workdesk'==finder.tab_id">
+				<div class="finder-workdesk-bar" v-if="!disable_workdesk && 'workdesk'==finder.tab_id">
 					操作台: 一个临时收纳台.
 					<button class="btn btn-default btn-sm" 
 					v-bind:disabled="this.workdesk.length==0"
 					v-on:click="clear_workdesk">清空列表</button>
 				</div>
 				<div class="finder-row">
-					<label class="finder-col-sel" v-if="finder.batchActions.length>0">
+					<label class="finder-col-sel" v-if="select_mode=='multi'">
 						<input type="checkbox" v-on:click="select_all" v-model="v_select_all" />
+					</label>
+					<label class="finder-col-sel" v-if="select_mode=='single'">
+						<input type="radio" style="visibility: hidden" />
 					</label>
 					<div class="row api-top-title">
 						<div v-for="(col, col_id) in finder.cols" v-bind:class="col_class[col_id]" v-if="!col.hidden">
@@ -111,17 +115,30 @@
 			</div>
 
 		<div name="finder-content" ref="content">
-			<div class="finder-body" v-on:mouseup="sel_mup($event)" v-bind:class="{'unselectable': unselectable}">
+			<div class="finder-body" 
+				v-if="finder.data"
+				v-on:mouseup="sel_mup($event)" 
+				v-bind:class="{'unselectable': unselectable}">
 
-				<div class="finder-item" v-for="(item,idx) in finder.data.items" v-bind:class="{'selected':checkbox[idx], 'detail':current_detail==idx}">
+				<div class="finder-item" 
+							v-for="(item,idx) in finder.data.items" 
+							v-bind:class="{'selected':(checkbox[idx] || radio==item.$id), 'detail':current_detail==idx}">
 					<div class="finder-row"
 							v-on:mouseout="sel_mout(idx,$event)"
 							v-on:mouseover="sel_mover(idx,$event)">
+
 						<label class="finder-col-sel" 
 							v-on:mousedown="sel_mdown(idx,$event)"
-							v-if="finder.batchActions.length>0">
+							v-if="select_mode=='multi'">
 							<input type="checkbox" v-model="checkbox[idx]" />
 						</label>
+						<label class="finder-col-sel" v-else-if="select_mode=='single'">
+							 <input type="radio" 
+									@click="radio_check(idx)" 
+									name="finder-select" 
+									:value="item.$id" v-model="radio" />
+						</label>
+
 						<div class="row api-top-title" v-on:click="toggle_detail(idx, $event)">
 							<div v-for="(col, col_id) in finder.cols" v-bind:class="col_class[col_id]" v-if="!col.hidden">
 								<span v-if="typeof(item[col_id])=='object' && item[col_id].date">
@@ -133,7 +150,7 @@
 						</div>
 					</div>
 					<div class="finder-detail" v-if="current_detail==idx">
-						  <ul class="nav nav-tabs" role="tablist" v-if="finder.infoPanels.length>1">
+						  <ul class="nav nav-tabs" role="tablist" v-if="finder.infoPanels && finder.infoPanels.length>1">
 						    <li v-for="(panel, panel_id) in finder.infoPanels" v-bind:class="{'active': panel_id==current_panel}">
 						    	<a v-on:click="show_panel(idx, panel_id)">{{panel.label}}</a>
 						    </li>
@@ -147,7 +164,7 @@
 				</div>
 			</div>
 
-			<transition name="finder-slide-bottom">
+			<transition name="finder-slide-bottom" v-if="this.finder.batchActions && this.finder.batchActions.length>0 && !disable_workdesk">
 				<div class="finder-batch-action-bar" v-if="selected.length>0">
 					<div>
 						<span>{{selected.length}}</span>
@@ -174,7 +191,17 @@
 				</div>
 			</transition>
 
-			<div v-show="items_loading" class="finder-masker" v-bind:style="{'background': masker_bgcolor}"></div>
+			<div 
+				v-show="items_loading" 
+				class="finder-masker" 
+				ref="loading"
+				v-bind:style="{'background': masker_bgcolor}">
+				<div class="loading">
+				  <div class="bounce1"></div>
+				  <div class="bounce2"></div>
+				  <div class="bounce3"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -329,9 +356,9 @@
 	position: absolute; 
 	width: 100%; 
 	height: 100%; 
+	padding-top: 10vh;
 	left:0; top:0;
 }
-
 .finder-search-bar .form-inline{
 	display: inline-block;
 	margin: 0 3rem 0.5rem 0;
@@ -355,6 +382,9 @@
 <script>
 export default {
 	  mounted (){
+	  	if(this.finder.batchActions && this.finder.batchActions.length>0){
+	  		this.select_mode = 'multi';
+	  	}
 	  },
 	  computed: {
 	  	col_class (){
@@ -387,6 +417,18 @@ export default {
 	  			}
 	  		}
 	  		return ret;
+	  	},
+	  	checked_result (){
+	  		var ret = [];
+	  		for(var i=0; i<this.checkbox.length;i++){
+	  			if(this.checkbox[i]==true){
+	  				ret.push({
+	  					value: this.finder.data.items[i].$id,
+	  					label: this.finder.data.items[i][0]
+	  				});
+	  			}
+	  		}
+	  		return ret;
 	  	}
 	  },
 	  methods:{
@@ -415,7 +457,8 @@ export default {
 					that.items_loading = false;
 				}
 			}).done(function(response){
-				this.checkbox = [];
+				that.checkbox = [];
+				that.v_select_all = false;
 				that.finder.data = response;
 			});
 	  	},
@@ -484,14 +527,26 @@ export default {
 			if( ["A","BUTTON","SELECT","INPUT"].indexOf(e.target.tagName)>=0 ){
 				return;
 			}
-			if(this.current_detail==id){
-				this.current_detail = undefined;
-			}else{
-				this.current_detail = id;
-				this.show_panel(id, 0);
+			if(this.finder.infoPanels && this.finder.infoPanels.length>0){
+				if(this.current_detail==id){
+					this.current_detail = undefined;
+				}else{
+					this.current_detail = id;
+					this.show_panel(id, 0);
+				}
+			}else if(this.select_mode=='single'){
+				this.radio = this.finder.data.items[id].$id;
+				this.radio_check(id);
+			}else if(this.select_mode=='multi'){
+				if(this.checkbox[id]){
+					this.$set(this.checkbox, id, false);
+				}else{
+					this.$set(this.checkbox, id, true);
+				}
 			}
 		},
-		go_page (v){
+		go_page (v, ev){
+			ev.stopPropagation();
 			this.reload(this.finder.data.currentPage+v);
 		},
 		select_tab (tab_id){
@@ -512,7 +567,8 @@ export default {
 				this.$set(this.finder.data.items[item_idx], 'panels', {});
 			}
 			if(!this.finder.data.items[item_idx].panels[panel_id]){
-				this.$set(this.finder.data.items[item_idx].panels, panel_id, 'loading...');				
+				this.$set(this.finder.data.items[item_idx].panels,
+					panel_id, $(this.$refs.loading).html());
 				var that = this;
 				$.ajax({
 					'url': this.finder.baseUrl,
@@ -564,6 +620,9 @@ export default {
 				this.unselectable = true;
 			}
 		},
+		radio_check(idx){
+			this.radio_label = this.finder.data.items[idx][0];
+		},
 		submit (idx, target){
 			this.batch_action_id = idx;
 			this.batch_action_target = target;
@@ -576,10 +635,15 @@ export default {
 		    current_detail: undefined,
 		    current_panel: 0,
 		    checkbox: [],
+		    radio: undefined,
+		    radio_label: "",
+		    disable_workdesk: false,
 		    workdesk: [],
 		    workdesk_ids: {},
 		    v_select_all: false,
+		    disable_tabber: false,
 		    items_loading: false,
+		    select_mode: '',
 		    panel_loading: false,
 		    unselectable: false,
 			batch_action_target: '',

@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
     <title>@yield('title') - {{$app_name}}</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">    
+    <meta name="csrf-token" content="{{ csrf_token() }}"> 
+    <meta name="admin-baseurl" content="{{ url('/') }}">
     <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
     <script src="{{ mix('/js/app.js') }}"></script>
   </head>
@@ -107,18 +108,12 @@
 
     <script>
     @if (isset($searchbar) and $searchbar)
-    var searchbar = {!! json_encode($searchbar) !!};
+    window.searchbar = {!! json_encode($searchbar) !!};
     @else
-    var searchbar = [];
+    window.searchbar = [];
     @endif;
 
-  	var app = new Vue({ 
-  		el: '#app',
-  		data: {
-  			searchbar: searchbar,
-  			appinfo_url: "{{ url('/admin-site-menus') }}",
-  			menus: {!! json_encode($app_menus) !!}
-  		}
-  	});
+    window.appinfo_url = "{{ url('/admin-site-menus') }}";
+    window.menus = {!! json_encode($app_menus) !!};
     </script>
 </html>
