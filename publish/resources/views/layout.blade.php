@@ -23,7 +23,7 @@
 			@if (Auth::guest())
 			<div class="admin-header-content">
 				<div>
-					<a href="{{ url('/login') }}" type="button" class="btn btn-default external">登陆系统</a>
+					<a href="{{ route('admin-login') }}" type="button" class="btn btn-default external">登陆系统</a>
 				</div>
 			</div>
 			@else
@@ -42,16 +42,16 @@
                     </a>  
                     <ul class="dropdown-menu-right dropdown-menu" role="menu">
                         <li>
-		                    <a href="{{ Luban::config()->get('sso_url') }}/profile" target="_blank" class="external">
+		                    <a href="{{ route('admin-profile') }}" target="_blank" class="external">
 		                        帐号设置
 		                    </a>                        
-                            <a href="{{ url('/logout') }}"
+                            <a href="{{ route('admin-logout') }}"
                                 onclick="event.preventDefault();
                                          document.getElementById('logout-form').submit();">
                                 退出系统
                             </a>
 
-                            <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
+                            <form id="logout-form" action="{{ route('admin-logout') }}" method="POST" style="display: none;">
                                 {{ csrf_field() }}
                             </form>
                         </li>
@@ -113,7 +113,7 @@
     window.searchbar = [];
     @endif;
 
-    window.appinfo_url = "{{ url('/admin-site-menus') }}";
+    window.appinfo_url = "{{ route('admin-site-menus') }}";
     window.menus = {!! json_encode($app_menus) !!};
     </script>
 </html>
