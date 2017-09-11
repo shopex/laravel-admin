@@ -23,7 +23,7 @@
 			@if (Auth::guest())
 			<div class="admin-header-content">
 				<div>
-					<a href="{{ route('admin-login') }}" type="button" class="btn btn-default external">登陆系统</a>
+					<a href="{{ route('login') }}" type="button" class="btn btn-default external">登陆系统</a>
 				</div>
 			</div>
 			@else
@@ -45,13 +45,13 @@
 		                    <a href="{{ route('admin-profile') }}" target="_blank" class="external">
 		                        帐号设置
 		                    </a>                        
-                            <a href="{{ route('admin-logout') }}"
+                            <a href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
                                          document.getElementById('logout-form').submit();">
                                 退出系统
                             </a>
 
-                            <form id="logout-form" action="{{ route('admin-logout') }}" method="POST" style="display: none;">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 {{ csrf_field() }}
                             </form>
                         </li>
