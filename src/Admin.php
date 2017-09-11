@@ -11,9 +11,6 @@ class Admin{
 	private $objectInputs = [];
 
 	public function routes(){
-        Route::get('login', 'Auth\LoginController@showLoginForm')->name('admin-login');
-        Route::post('login', 'Auth\LoginController@login');
-        Route::post('logout', 'Auth\LoginController@logout')->name('admin-logout');
 		Route::get('admin', 'Admin\\AdminController@index');
 		Route::get('admin/give-role-permissions', 'Admin\\AdminController@getGiveRolePermissions');
 		Route::post('admin/give-role-permissions', 'Admin\\AdminController@postGiveRolePermissions');

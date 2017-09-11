@@ -55,7 +55,6 @@ $(function(){
 			}
 
 			var confirm = el.attr('data-modal-confirm');
-			console.info(el, confirm);
 			if(confirm && !ev.originalEvent.confirmed){
 				var win = getComponent();
 				win.confirmMode = true;
