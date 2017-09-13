@@ -61,37 +61,9 @@
 			</div>
 
 			<div class="finder-header" ref="header">
-				<form class="finder-search-bar" v-on:submit="reload()" v-if="'workdesk'!=finder.tab_id && finder.searchs && finder.searchs.length>0">
-
-					<div class="form-inline" v-for="(search, idx) in finder.searchs">
-					  <div class="form-group">
-					    {{search.label}}
-					  </div>
-					  <div class="form-group">
-					    <select name="mode[]" v-model="search.mode" 
-					    	v-on:change="search.value&&reload()" v-if="search.type=='string'">
-					    	<option value="=">是</option>
-					    	<option value="!=">不是</option>
-					    	<option value="begin">开始于</option>
-					    	<option value="has">包含</option>
-					    	<option value="not_begin">不开始于</option>
-					    	<option value="not_has">不包含</option>
-					    </select>
-					    <select name="mode[]" v-model="search.mode"
-					    	v-on:change="search.value&&reload()" v-else-if="search.type=='number'">
-					    	<option value="=">=</option>
-					    	<option value="gt">&gt;</option>
-					    	<option value="lt">&lt;</option>
-					    </select>
-					    <span v-else>
-					    	:
-					    	<input type="hidden" name="mode[]" value="=" />
-					    </span>
-					  </div>
-					  <div class="form-group">
-					    <input type="text" name="value[]" v-model="search.value" v-on:change="reload()" />
-					  </div>
-					</div>
+				<form class="finder-search-bar" v-on:submit="reload()" 
+					v-if="'workdesk'!=finder.tab_id && finder.searchs && finder.searchs.length>0">
+					<filters :searchs="finder.searchs" @change="reload" ref="filters"></filters>
 				</form>
 
 				<div class="finder-workdesk-bar" v-if="!disable_workdesk && 'workdesk'==finder.tab_id">
@@ -439,12 +411,7 @@ export default {
 	  		this.items_loading = true;
 			this.current_detail = undefined;
 
-			var filters = [];
-			for(var i=0; i<this.finder.searchs.length; i++){
-				if(this.finder.searchs[i].value){
-					filters.push([i, this.finder.searchs[i].value, this.finder.searchs[i].mode]);
-				}
-			}
+			var filters = this.$refs.filters.data();
 
 			var that = this;
 			$.ajax({
