@@ -46,8 +46,8 @@ class LubanAdminProvider extends ServiceProvider
      */
     public function register()
     {
-        Command::register();
-
+        $comman = new Command();
+        $comman->register();
         $this->app->singleton('LubanAdmin',function(){
             return new \Shopex\LubanAdmin\Admin;
         });
