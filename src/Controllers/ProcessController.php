@@ -122,17 +122,18 @@ class ProcessController extends Controller
         $generator->is_controller  = 'yes';
         $generator->is_migration  = 'yes';
 
-        $fields_array['fields'][] = 'name1'; 
-        $fields_array['field_descs'][] = '名称1'; 
+        $fields_array['fields'][] = 'name'; 
+        $fields_array['field_descs'][] = '名称'; 
         $fields_array['fields_type'][] = "1"; 
         $fields_array['fields_required'][] = '1'; 
         $fields_array['fields_search'][] = '1'; 
         $fields_array['fields_list'][] = '1'; 
         $generator->fields = $fields_array;
+        $files_array = [];
         $curdview = new CrudViewCommand();
         $curdtypekey = array_keys($curdview->getTypeLookup());
         $curdtype = array_combine($curdtypekey, $curdtypekey);
-        return view('admin::generator',compact('generator','curdtype'));
+        return view('admin::generator',compact('generator','curdtype','files_array'));
     }
 
     /**

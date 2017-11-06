@@ -1,4 +1,4 @@
-@if(is_array($files_array))
+@if(is_array($files_array) && $files_array)
 <div class="panel-body">
     <table class="table table-borderless">
         <tr>
