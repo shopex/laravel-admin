@@ -47,6 +47,7 @@ class ProcessController extends Controller
                     ->addColumn('生成控制器', 'is_controller')->size(1)
                     ->addColumn('生成Migration', 'is_migration')->size(1)
                     ->addColumn('是否暂存', 'staging')->size(1)
+                    ->addTab("全部", [])
                     ->addTab("暂存", [['staging','=','yes']])
                     ->addTab("已生成", [['staging','=','no']])
                     ->addSearch('模型名称', 'model_title', 'string')
@@ -170,6 +171,7 @@ class ProcessController extends Controller
             $generator = Generator::findOrFail($request->id);
             $generator->removeAllFile();
             $requestData['files'] = '';
+            $requestData['staging'] = 'yes';
             $generator->update($requestData);
             return redirect('admin/generator');
         }
@@ -187,7 +189,7 @@ class ProcessController extends Controller
         $commandArg['--id'] = $generator->id;
 
         if ($requestData['staging'] == 'yes') {
-            return redirect('admin/generator/model');
+            return redirect('admin/generator');
         }
         $commandArg['name'] =  $request->crud_name;
 
