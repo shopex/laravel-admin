@@ -1,4 +1,4 @@
-@extends('admin::layout')
+  @extends('admin::layout')
 
 @section('title', '代码生成器')
 
@@ -15,141 +15,22 @@
                     <div class="panel-body">
                         <form class="form-horizontal" method="post" id="form" action="{{ url('/admin/generator') }}">
                             {{ csrf_field() }}
-                            <div class="row">
-                                <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="crud_name" class="col-md-4 control-label" >模型名称:</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="model_title" class="form-control" id="model_title" placeholder="用户" required="true" v-model="model_title">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="crud_name" class="col-md-4 control-label" >模型名称:</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="crud_name" class="form-control" id="crud_name" placeholder="Posts" required="true" v-model="crud_name">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="controller_namespace" class="col-md-4 control-label">控制器命名空间:</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="controller_namespace" class="form-control" id="controller_namespace" placeholder="Admin" 
-                                        v-model="controller_namespace"
-                                        >
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="route_group" class="col-md-4 control-label">路由组前缀:</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="route_group" class="form-control" id="route_group" placeholder="admin" v-model="route_group">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="view_path" class="col-md-4 control-label">视图路径:</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="view_path" class="form-control" id="view_path" placeholder="admin"  v-model="view_path">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="route" class="col-md-4 control-label">是否生成路由:</label>
-                                    <div class="col-md-8">
-                                        <select name="route" class="form-control" id="route">
-                                            <option value="yes">Yes</option>
-                                            <option value="no">No</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                 </div>
-                                 <div class="col-md-6">
-                                    <ul class="list-group">
-                                        <li class="list-group-item" v-if="crud_name">
-                                            模型 : <code>app/@{{crud_name}}.php</code>
-                                        </li>
-                                        <li class="list-group-item" v-if="controller_namespace">
-                                            控制器 : <code>app/Http/Controllers/@{{controller_namespace}}/@{{crud_name}}Controller.php</code>
-                                        </li>
-                                          <li  class="list-group-item"  v-if="route_group">
-                                            路由 : <code>Route::resource('@{{route_group}}/@{{crud_name}}', '@{{controller_namespace}}\\@{{crud_name}}Controller');</code>
-                                        </li>
-                                        <li class="list-group-item" v-if="view_path">
-                                            视图 : <code>resources/views/@{{view_path}}/@{{lower_crud_name}}</code> 
-                                        </li>
-                                        <li class="list-group-item" v-if="crud_name">
-                                            表名:<code>@{{crud_name}}s</code>
-                                        </li>
-
-                                    </ul>
-                                    
-                                 </div>
-                            
-                            </div>
-                            <div class="form-group table-fields">
-                                <h4 class="text-center">表字段 <a target="__black" href="https://shimo.im/doc/RWHF4vw1eC87J0M3?r=MQLEYZ">建表规约</a></h4><br>
-                                <div class="entry col-md-12 col-md-offset-1 form-inline">
-                                    <input class="form-control" name="fields[]" type="text" placeholder="字段名称" required="true">
-                                    <input class="form-control" name="field_descs[]" type="text" placeholder="字段描述" required="true">
-                                    <select name="fields_type[]" class="form-control">
-                                        <option value="string">string</option>
-                                        <option value="char">char</option>
-                                        <option value="varchar">varchar</option>
-                                        <option value="password">password</option>
-                                        <option value="email">email</option>
-                                        <option value="date">date</option>
-                                        <option value="datetime">datetime</option>
-                                        <option value="time">time</option>
-                                        <option value="timestamp">timestamp</option>
-                                        <option value="text">text</option>
-                                        <option value="mediumtext">mediumtext</option>
-                                        <option value="longtext">longtext</option>
-                                        <option value="json">json</option>
-                                        <option value="jsonb">jsonb</option>
-                                        <option value="binary">binary</option>
-                                        <option value="number">number</option>
-                                        <option value="integer">integer</option>
-                                        <option value="bigint">bigint</option>
-                                        <option value="mediumint">mediumint</option>
-                                        <option value="tinyint">tinyint</option>
-                                        <option value="smallint">smallint</option>
-                                        <option value="boolean">boolean</option>
-                                        <option value="decimal">decimal</option>
-                                        <option value="double">double</option>
-                                        <option value="float">float</option>
-                                    </select>
-
-                                    <label>必填</label>
-                                    <select name="fields_required[]" class="form-control">
-                                        <option value="0">No</option>
-                                        <option value="1">Yes</option>
-                                    </select>
-                                    <label>搜索</label>
-                                    <select name="fields_search[]" class="form-control">
-                                        <option value="0">No</option>
-                                        <option value="1">Yes</option>
-                                    </select>
-                                    <label>列表显示</label>
-                                    <select name="fields_list[]" class="form-control">
-                                        <option value="0">No</option>
-                                        <option value="1">Yes</option>
-                                    </select>
-                                    <button class="btn btn-success btn-add inline" type="button">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </button>
-                                    <button class="btn btn-success btn-copy inline" type="button">
-                                        <span class="glyphicon glyphicon-copy"></span>
-                                    </button>
-                                </div>
-                            </div>
-                            <p class="help text-center">It will automatically assume form fields based on the migration field type.</p>
+                            {!! Form::hidden('id', $generator->id, ['class' => 'form-control', 'required' => 'required']) !!}
+                            @include('admin::generator-header')
+                            @include('admin::generator-body')
                             <br>
                             <div class="form-group">
                                 <div class="col-md-offset-4 col-md-4">
                                     <button type="submit" class="btn btn-primary" name="generate">生成</button>
+                                    <input type="checkbox" name="staging">暂存
+                                    <input type="checkbox" name="regen">重新生成
+                                    <input type="checkbox" name="remove_file">移除文件
                                 </div>
                             </div>
                         </form>
 
                     </div>
+                    @include('admin::generator-files')
                 </div>
             </div>
         </div>
@@ -179,15 +60,25 @@
             var app = new Vue({
               el: '#form',
               data: {
-                crud_name: '',
-                controller_namespace:'',
-                route_group:'',
-                view_path:'',
-                model_title:''
+                crud_name: '{{ $generator->crud_name }}',
+                controller_namespace:'{{ $generator->controller_namespace }}',
+                model_type:'{{ $generator->model_type }}',
+                route_group:'{{ $generator->route_group }}',
+                view_path:'{{ $generator->view_path }}',
+                model_title:'{{ $generator->view_path }}'
               },
               computed: {
                  lower_crud_name:function(){
                     return this.crud_name.toLowerCase();
+                 },
+                 model_namespace:function(){
+                    return "Models\\"+this.model_type.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
+                 },
+                 model_namespace_show:function(){
+                    return this.model_namespace.replace('\\','/');
+                 },
+                 view_path_show:function(){
+                    return this.view_path.replace(/\./g,'/');
                  }
               }
             })

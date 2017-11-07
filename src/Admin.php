@@ -17,8 +17,13 @@ class Admin{
 		Route::resource('admin/roles', 'Admin\\RolesController');
 		Route::resource('admin/permissions', 'Admin\\PermissionsController');
 		Route::resource('admin/users', 'Admin\\UsersController');
-		Route::get('admin/generator', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@getGenerator']);
+
+		Route::get('admin/generator/new', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@getGenerator']);
+		Route::get('admin/generator', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@index']);
+		Route::get('admin/generator/{id}/edit', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@edit']);
 		Route::post('admin/generator', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@postGenerator']);
+		
+
 		Route::any('admin/component/objectinput/{type}', ['uses' => '\Shopex\LubanAdmin\Controllers\ComponentController@objectInput']);
 	}
 

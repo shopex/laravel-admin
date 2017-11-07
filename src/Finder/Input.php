@@ -4,6 +4,7 @@ namespace Shopex\LubanAdmin\Finder;
 use Shopex\LubanAdmin\Finder;
 use Collective\Html\HtmlFacade as Html;
 use Illuminate\Support\HtmlString;
+use Collective\Html\FormFacade as Form;
 
 class Input extends Finder{
 
@@ -17,6 +18,12 @@ class Input extends Finder{
 	public function html($name, $value=null, $attrs=[], $filters=[]){
 		if(!isset($attrs['id']) || !$attrs['id']){
 			$attrs['id'] = uniqid('el_');
+		}
+		if ( !$value ) {
+			$value = Form::getValueAttribute($name, $value);
+			if (!$value) {
+				$value  = 0;
+			}
 		}
 		$attrs['value'] = $value;
 		$attrs['name'] = $name;
