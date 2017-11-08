@@ -1,13 +1,16 @@
 <template>
-	<div v-bind:class="{unselectable: draging}" class="desktop">
+	<div v-bind:class="{unselectable: draging}" class="desktop" @click="link_action">
 
 		<div class="sidepanel">
-			<h1 class="title">logo</h1>
+			<h1 class="brand">logo</h1>
 			<div class="searchbar">
 				<searchbar :items="search"></searchbar>
 			</div>
 			<div class="menus">
-				<button @click="open()">start</button>
+				<appmenu :menus="menus"></appmenu>
+			</div>
+			<div class="verpanel">
+				&copy; shopex 2017
 			</div>
 		</div>
 
@@ -43,6 +46,7 @@
 						:zindex="10+win.zindex"
 						:isfocus="win.isfocus"
 						:id="win.id"
+						:url="win.url"
 						@min="win.is_min=true;setLayers()"
 						@focus="active(win.id)"
 						@close="close(win.id)"
@@ -63,6 +67,8 @@ $topbar-active-bg: #f0f0f0;
 $sidebar-bg: #002833;
 $sidebar-fg: #fff;
 $topbar-icons-width: 10rem;
+$sidebar-width: 20rem;
+$task-item-width: 10rem;
 
 .desktop{
 	display: flex;
@@ -135,16 +141,19 @@ $topbar-icons-width: 10rem;
 		height: $topbar-height;
 	}
 	.taskbar-item{
-		flex: 10rem 0;
+		flex: $task-item-width 0;
 		display: flex;
 	}
 	.taskbar-item-title{
 		flex: 1 1;
 		padding: 0 0.5rem;
 		overflow: hidden;
+		text-overflow: ellipsis;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
+		white-space: nowrap;
+		max-width: $task-item-width;
 	}
 	.active .taskbar-item-title{
 		background: $topbar-active-bg;
@@ -152,7 +161,7 @@ $topbar-icons-width: 10rem;
 	}
 	.taskbar-item-split{
 		flex: 1px 0;
-		background: #ccc;
+		background: transparent;
 		margin: 5px 0;
 	}
 	.icons{
@@ -186,9 +195,8 @@ $topbar-icons-width: 10rem;
 .sidepanel{
 	background: $sidebar-bg;
 	border-right:1px solid #ccc;
-	flex: 20rem 0;
+	flex: $sidebar-width 0;
 	color: sidebar-fg;
-	padding: 8px;
 	display: flex;
 	flex-direction: column;
 
@@ -197,16 +205,26 @@ $topbar-icons-width: 10rem;
 		border: 1px solid rgba(255,255,255, 0.5);
 	}
 
-	.title{
+	.brand{
 		flex: 4rem 0;
+		text-align: center;
+		color: #f0f0f0;
 	}
 
 	.searchbar{
 		flex: 3rem 0;
+		padding-bottom: 1rem;
 	}
 
 	.menus{
 		flex: 1 1;
+	}
+
+	.verpanel{
+		flex: 1rem 0;
+		padding: 1rem;
+		text-align: center;
+		font-size: 0.8rem;
 	}
 }
 </style>
@@ -224,16 +242,35 @@ export default {
 	},
 	mounted(){
 		this.$watch('layers', this.setLayers);
+		window.$desktop = this;
 	},
 	methods: {
-		open() {
+		link_action(ev){
+			var el = this.find_el(ev.target, 'A', 3);
+			if(el && $(el).attr('target')=='window'){
+				this.open($(el).attr('href'));
+				ev.stopPropagation();
+		        ev.preventDefault();
+			}
+		},
+		find_el(el, tag, n){
+			if(el.tagName==tag){
+				return el;
+			}else if(n!=0){
+				return this.find_el(el.parentNode, tag, n-1);
+			}else{
+				return false;
+			}
+		},
+		open(url) {
 			var win = {
 				id: this.win_id++,
 				width: 640,
 				height: 480,
 				zindex: 0,
 				title: "",
-				is_min: false
+				is_min: false,
+				url: url
 			};
 
 			win.left = 20 + ($(this.$refs.workspace).width() - win.width - 20) * Math.random();

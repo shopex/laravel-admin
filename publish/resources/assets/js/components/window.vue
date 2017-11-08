@@ -17,7 +17,10 @@
 					<i v-if="closeAble" @click="$emit('close')" class="ico-close glyphicon glyphicon-remove"></i>
 				</div>
 			</div>
-			<div class="w-body" ref="body" v-bind:style="{
+			<div class="w-body" ref="body" 
+			 	@click="link_action" 
+			 	@submit="form_action"
+				v-bind:style="{
 					width: width+'px',
 					height: height+'px'
 				}">
@@ -42,7 +45,6 @@
 	background: #f0f0f0;
 	position: absolute;
 	border-radius: 5px;
-	overflow: hidden;
 	box-shadow:0px 0px 8px rgba(0,0,0,0.5);
 }
 .w-box.is_max{
@@ -135,7 +137,7 @@
 
 <script>
 export default {
-	props: ["left", "top", "zindex", "isfocus", "initwidth", "initheight", "id"],
+	props: ["left", "top", "zindex", "isfocus", "initwidth", "initheight", "id", "url"],
 	data() {
 		return {
 			width: 640,
@@ -172,8 +174,36 @@ export default {
 		});
 
 		this.title = "title";
+		if(this.url){
+			this.load(this.url);
+		}
 	},
 	methods: {
+		link_action(ev){
+			var el = this.find_el(ev.target, 'A', 3);
+			if(el && (!$(el).attr('target') || $(el).attr('target')=='window')){
+				var url = $(el).attr('href');
+				if(url){
+					ev.stopPropagation();
+			        ev.preventDefault();
+					this.load(url);
+				}
+			}
+		},
+		form_action(ev){
+			console.info(ev);
+			ev.stopPropagation();
+	        ev.preventDefault();
+		},
+		find_el(el, tag, n){
+			if(el.tagName==tag){
+				return el;
+			}else if(n!=0){
+				return this.find_el(el.parentNode, tag, n-1);
+			}else{
+				return false;
+			}
+		},		
 		load(url){
 			var that = this;
 			$.ajax({
@@ -181,7 +211,30 @@ export default {
 				method: 'get',
 				success: function(data){
 					var el = $('<div></div>').html(data);
-					that.body.empty().append($('.main-content', el));
+					var content = $('.main-content', el);
+					var scripts = $('script', content).remove();
+					that.title = $('title', el).text();
+					that.body.empty().append(content);
+
+					(function(){
+
+						var $ = function(s,c,r){
+							c = c || that.$refs.body;
+							return jQuery.fn.init(s, c, r);
+						}
+
+						var Vue = function(options){
+							if(typeof options.el == 'string'){
+								options.el = $(options.el, that.$refs.body)[0];
+							}
+							return new window.Vue(options);
+						}
+						Vue.prototype=window.Vue;
+
+						for(var i=0; i<scripts.length; i++){
+							eval(scripts[i].innerHTML);
+						}
+					})();
 				}
 			});
 		},
