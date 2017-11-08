@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Shopex\LubanAdmin\Finder;
 use App\Role;
 use App\User;
 use Illuminate\Http\Request;
@@ -13,21 +14,31 @@ class UsersController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return void
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
-        $keyword = $request->get('search');
-        $perPage = 15;
+        $dataSet = User::class;
 
-        if (!empty($keyword)) {
-            $users = User::where('name', 'LIKE', "%$keyword%")->orWhere('email', 'LIKE', "%$keyword%")
-                ->paginate($perPage);
-        } else {
-            $users = User::paginate($perPage);
-        }
+        $finder = Finder::create($dataSet, '用户列表')
+                    ->setId('id')
+                    ->addAction('新建用户', [$this, 'create'])
+                    ->addSort('按修改时间倒排', 'created_at', 'desc')
+                    ->addSort('按修改时间正排', 'created_at')
+                    ->addBatchAction('删除', [$this, 'destroy'])
+                    ->addColumn('操作', 'id')->modifier(function($id){
+                        return '<a href="'.url("/admin/users/$id/edit").' " title="编辑"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>编辑</button></a>';
+                    })->html(true)
+                    ->addColumn('名称', 'name')
+                    ->addColumn('邮箱', 'email')
+                    
+                    ->addSearch('名称', 'name', 'string')
+                    ->addSearch('邮箱', 'email', 'string')
+                    
+                    ->addTab("全部", [])
+                    ->addInfoPanel('基本信息', [$this, 'detail']);
 
-        return view('admin::users.index', compact('users'));
+        return $finder->view();
     }
 
     /**
@@ -42,7 +53,7 @@ class UsersController extends Controller
 
         return view('admin::users.create', compact('roles'));
     }
-
+    
     /**
      * Store a newly created resource in storage.
      *

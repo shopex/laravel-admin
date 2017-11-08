@@ -70,13 +70,13 @@
 			<div class="main-content">
 				<div class="main-header">
 					<div class="main-header-basic">
-          @if (array_key_exists('navpath', View::getSections()))
-            @yield('navpath')
-          @else
-            <ol class="breadcrumb">
-              <li class="active">@yield('title')</li>
-            </ol>          
-          @endif
+                          @if (array_key_exists('navpath', View::getSections()))
+                            @yield('navpath')
+                          @else
+                            <ol class="breadcrumb">
+                              <li class="active">@yield('title')</li>
+                            </ol>          
+                          @endif
 						<div class="main-header-action">
 							@yield('action-bar')
 						</div>
@@ -114,6 +114,6 @@
     @endif;
 
     window.appinfo_url = "{{ route('admin-site-menus') }}";
-    window.menus = {!! json_encode($app_menus) !!};
+    window.menus = {!! json_encode((new Shopex\LubanAdmin\Permission\Menu())->show($app_menus)) !!};
     </script>
 </html>

@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+use Shopex\LubanAdmin\Permission\Check;
 
 trait HasRoles
 {
@@ -13,7 +14,19 @@ trait HasRoles
     {
         return $this->belongsToMany(Role::class);
     }
-
+    /**
+     * A user may have multiple roles.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function getCanRoute()
+    {
+        $allpermissions = [];
+        foreach ($this->roles as $role) {
+            $allpermissions = array_merge($role->permissions(),$allpermissions);
+        }
+        return $allpermissions;
+    }
     /**
      * Assign the given role to the user.
      *
@@ -104,12 +117,11 @@ trait HasRoles
         if ($this->isAdmin()) {
             return true;
         }
-        try {
-            $permissions = \App\Permission::where("name",$permission)->firstOrFail();
-            return $this->hasPermission($permissions);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return false;
-        }        
+        $allpermissions = $this->getCanRoute();
+        $check = new Check();
+        $check->prcessPermission();
+        return $check->hasPermission($permission,$allpermissions);
+ 
     }
     /**
      * Determine if the user may perform the given permission.

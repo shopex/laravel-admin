@@ -11,19 +11,27 @@ class Admin{
 	private $objectInputs = [];
 
 	public function routes(){
-		Route::get('admin', 'Admin\\AdminController@index');
-		Route::get('admin/give-role-permissions', 'Admin\\AdminController@getGiveRolePermissions');
-		Route::post('admin/give-role-permissions', 'Admin\\AdminController@postGiveRolePermissions');
-		Route::resource('admin/roles', 'Admin\\RolesController');
-		Route::resource('admin/permissions', 'Admin\\PermissionsController');
-		Route::resource('admin/users', 'Admin\\UsersController');
-
-		Route::get('admin/generator/new', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@getGenerator']);
-		Route::get('admin/generator', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@index']);
-		Route::get('admin/generator/{id}/edit', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@edit']);
-		Route::post('admin/generator', ['uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@postGenerator']);
 		
-
+		Route::resource('admin/roles', 'Admin\\RolesController');
+		Route::resource('admin/users', 'Admin\\UsersController');
+		Route::Group(['prefix'=>'admin/generator'],function(){
+			Route::get('/',[
+					'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@index',
+					'as'=>'admin.generator.index'
+				]);
+			Route::post('/',[
+				'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@postGenerator',
+				'as'=>'admin.generator.post'
+			]);
+			Route::get('/new',[
+					'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@getGenerator',
+					'as'=>'admin.generator.index',
+				]);
+			Route::get('{id}/edit',[
+					'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@edit',
+					'as'=>'admin.generator.edit'
+				]);
+		});
 		Route::any('admin/component/objectinput/{type}', ['uses' => '\Shopex\LubanAdmin\Controllers\ComponentController@objectInput']);
 	}
 
