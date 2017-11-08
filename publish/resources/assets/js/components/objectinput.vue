@@ -201,7 +201,7 @@ export default {
 			}
 		},
 		confirm (){
-			$(this.$refs.modal).modal('hide');			
+			$(this.$refs.modal).modal('hide');
 			if(!this.finder){
 				return;
 			}
