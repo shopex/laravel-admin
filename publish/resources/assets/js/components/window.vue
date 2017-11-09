@@ -10,7 +10,15 @@
 					@mousedown="start_drag($event, 1)">
 					{{title}}
 				</div>
-				<div class="w-icons">
+				<div class="w-pin" 
+					:class="{active: is_pin}"
+					@click="is_pin=!is_pin">
+					<i class="glyphicon glyphicon-pushpin"></i>
+				</div>
+				<div class="w-icons" 
+					:class="{deactive: !icon_hover}"
+					@mouseover="icon_hover=true" 
+					@mouseout="icon_hover=false">
 					<i class="ico-min glyphicon glyphicon-minus" @click="min()"></i>
 					<i v-if="is_max" @click="normal()" class="ico-max glyphicon glyphicon-unchecked"></i>
 					<i v-else @click="max()" class="ico-max glyphicon glyphicon-unchecked"></i>					
@@ -65,10 +73,13 @@
 	font-weight: bold;
 }
 .w-icons{
-	flex:8rem 0;
+	flex:0 0;
+	margin-left: 1rem;
+	padding-left: 1rem;
 	text-align: right;
 	line-height: 2.5rem;
 	padding-right:1rem;
+	white-space: pre;
 }
 .w-head{
 	display: flex;
@@ -80,23 +91,46 @@
 	-ms-user-select: none;
 	user-select: none;		
 }
+.w-pin{
+	line-height: 2.5rem;
+	cursor: pointer;
+}
+.w-pin i{
+	color: #ccc;
+}
+.w-pin.active i{
+	color: red;
+	text-shadow:2px 2px 3px rgba(0,0,0,0.5);	
+}
 .focus .w-head{
 	color: #000;
+}
+.w-icons i{
+	background: #ccc;
+	border-radius: 100%;
+	font-size: 0.3rem;
+	display: inline-block;
+	color: #333;
+	width: 1rem;
+	height: 1rem;
+}
+.w-icons.deactive i::before{
+	content: '';
 }
 .w-icons .ico-min, .w-icons .ico-max, .w-icons .ico-close{
 	cursor: pointer;
 }
 .focus .w-icons .ico-min{
-	color: #ffbe2e;
+	background: #ffbe2e;
 }
 .focus .w-icons .ico-max{
-	color: #2bca41;
+	background: #2bca41;
 }
 .focus .w-icons .ico-close{
-	color: #ff6058;
+	background: #ff6058;
 }
 .is_max .w-icons .ico-min,.is_max  .w-icons .ico-max,.is_max  .w-icons .ico-close{
-	color: #ccc;
+	background: #ccc;
 }
 .w-mask{
 	position: absolute;
@@ -149,6 +183,8 @@ export default {
 			is_model: false,
 			is_max: false,
 			is_min: false,
+			is_pin: false,
+			icon_hover: false,
 			title: "",
 			child: [],
 			draging: {},
@@ -171,6 +207,9 @@ export default {
 		this.win.on('focus', this.onFocus);
 		this.$watch('title', function(){
 			that.$emit('title', that.id, that.title);
+		});
+		this.$watch('is_pin', function(){
+			that.$emit('pin', that.id, that.is_pin);
 		});
 
 		this.title = "title";
@@ -211,9 +250,11 @@ export default {
 				method: 'get',
 				success: function(data){
 					var el = $('<div></div>').html(data);
+					that.title = $('meta[name="page-title"]', el).attr('content');
+					$('meta[name="page-title"]').attr('content', $('meta[name="csrf-token"]', el).attr('content'));
+
 					var content = $('.main-content', el);
 					var scripts = $('script', content).remove();
-					that.title = $('title', el).text();
 					that.body.empty().append(content);
 
 					(function(){
@@ -230,6 +271,9 @@ export default {
 							return new window.Vue(options);
 						}
 						Vue.prototype=window.Vue;
+						for(var i in window.Vue){
+							Vue[i] = window.Vue[i];
+						}
 
 						for(var i=0; i<scripts.length; i++){
 							eval(scripts[i].innerHTML);

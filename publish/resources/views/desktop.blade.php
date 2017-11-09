@@ -11,7 +11,34 @@
   </head>
     <body>
         <div id="app">
-            <desktop :menus="menus" :search="searchbar"></desktop>
+            <desktop :menus="menus" :search="searchbar">
+                <div slot="topbar">
+                    <appsel appinfo_url="{{ route('admin-site-menus') }}"></appsel>
+                    <span class="dropdown pull-right">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                            {{ Auth::user()->name }} <span class="caret"></span>
+                        </a>  
+                        <ul class="dropdown-menu-right dropdown-menu" role="menu">
+                            <li>
+                                <a href="{{ route('admin-profile') }}" target="_blank" class="external">
+                                    帐号设置
+                                </a>                        
+                                <a href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
+                                             document.getElementById('logout-form').submit();">
+                                    退出系统
+                                </a>
+
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    {{ csrf_field() }}
+                                </form>
+                            </li>
+                        </ul>
+                    </span>
+                </div>
+
+                <span slot="copyright">&copy; shopex 2017</span>
+            </desktop>
         </div>
     </body>
 
@@ -22,7 +49,6 @@
     window.searchbar = [];
     @endif;
 
-    window.appinfo_url = "{{ route('admin-site-menus') }}";
     window.menus = {!! json_encode($app_menus) !!};
 
     new Vue({

@@ -9,8 +9,8 @@
 			<div class="menus">
 				<appmenu :menus="menus"></appmenu>
 			</div>
-			<div class="verpanel">
-				&copy; shopex 2017
+			<div class="copyright">
+				<slot name="copyright"></slot>
 			</div>
 		</div>
 
@@ -32,7 +32,9 @@
 						<span class="taskbar-item-split"></span>
 					</div>
 				</transition-group>
-				<div class="icons">icons</div>
+				<div class="icons">
+					<slot name="topbar"></slot>
+				</div>
 				<div class="topbar-shadow"></div>
 			</div>
 
@@ -43,10 +45,11 @@
 						:top="win.top"
 						:initwidth="win.width"
 						:initheight="win.height"
-						:zindex="10+win.zindex"
+						:zindex="(win.is_pin?500:10)+win.zindex"
 						:isfocus="win.isfocus"
 						:id="win.id"
 						:url="win.url"
+						@pin="pin"
 						@min="win.is_min=true;setLayers()"
 						@focus="active(win.id)"
 						@close="close(win.id)"
@@ -60,6 +63,19 @@
 		<div class="background"></div>
 	</div>
 </template>
+
+<style scoped>
+.topbar >>> a, .topbar >>> a:hover{
+	text-decoration: none;
+	color: #333; 
+}
+.topbar >>> .topbar-icon{
+	font-size: 150%;
+	line-height: 3rem;
+	margin-right: 1rem
+}
+</style>
+
 <style scoped lang="scss">
 $topbar-height: 3rem;
 $topbar-bg: #fff;
@@ -77,6 +93,7 @@ $task-item-width: 10rem;
 	left: 0;
 	right: 0;
 	bottom: 0;
+	overflow: hidden;
 
 	.background{
 		z-index: -99;
@@ -85,7 +102,7 @@ $task-item-width: 10rem;
 		right:0;
 		top:0;
 		bottom: 0;
-	}	
+	}
 }
 
 .taskbar-enter-active, .taskbar-leave-active {
@@ -161,8 +178,8 @@ $task-item-width: 10rem;
 	}
 	.taskbar-item-split{
 		flex: 1px 0;
-		background: transparent;
-		margin: 5px 0;
+		background: #aaa;
+		margin: 5px 3px;
 	}
 	.icons{
 		position: absolute;
@@ -220,7 +237,7 @@ $task-item-width: 10rem;
 		flex: 1 1;
 	}
 
-	.verpanel{
+	.copyright{
 		flex: 1rem 0;
 		padding: 1rem;
 		text-align: center;
@@ -236,12 +253,14 @@ export default {
 		return {
 			draging: false,
 			win_id: 0,
+			title: "",
 			windows: {},
 			layers: []
 		}
 	},
 	mounted(){
 		this.$watch('layers', this.setLayers);
+		this.title = document.title;
 		window.$desktop = this;
 	},
 	methods: {
@@ -270,6 +289,7 @@ export default {
 				zindex: 0,
 				title: "",
 				is_min: false,
+				is_pin: false,
 				url: url
 			};
 
@@ -278,6 +298,9 @@ export default {
 
 			this.layers.push(win.id);
 			this.$set(this.windows, win.id, win);
+		},
+		pin(id, is_pin){
+			this.windows[id].is_pin = is_pin;
 		},
 		active(id){
 			this.layers = this.delete(this.layers, id);
@@ -320,8 +343,12 @@ export default {
 				}
 			}
 			if(last_show){
+				this.updateTitle(last_show);
 				last_show.isfocus = true;
 			}
+		},
+		updateTitle(win){
+			document.title = win.title? ( win.title + ' - ' + this.title ) : this.title;
 		},
 		close(id){
 			this.layers = this.delete(this.layers, id);
@@ -329,6 +356,9 @@ export default {
 		},
 		onTitleChange(id, title){
 			this.windows[id].title = title;
+			if(this.windows[id].isfocus){
+				this.updateTitle(this.windows[id]);
+			}
 		}
 	}
 }
