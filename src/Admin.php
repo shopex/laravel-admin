@@ -12,11 +12,17 @@ class Admin{
 
 	public function routes(){
 		Route::group(['middleware' => 'auth'], function () {
-			Route::resource('admin/roles', 'Admin\\RolesController');
-			Route::resource('admin/users', 'Admin\\UsersController');
-	        Route::get('admin/desktop', ['as'=>'desktop', function () {
+	        Route::get('admin/desktop', ['as'=>'admin.desktop', function () {
 	        	            return view('admin::desktop');
 	        	        }]);
+			Route::any('admin/component/objectinput/{type}', ['uses' => '\Shopex\LubanAdmin\Controllers\ComponentController@objectInput']);
+		});
+	}
+
+	public function super_routes(){
+		Route::group(['middleware' => 'auth'], function () {
+			Route::resource('admin/roles', 'Admin\\RolesController');
+			Route::resource('admin/users', 'Admin\\UsersController');
 			Route::Group(['prefix'=>'admin/generator'],function(){
 				Route::get('/',[
 						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@index',
@@ -35,7 +41,6 @@ class Admin{
 						'as'=>'admin.generator.edit'
 					]);
 			});
-			Route::any('admin/component/objectinput/{type}', ['uses' => '\Shopex\LubanAdmin\Controllers\ComponentController@objectInput']);
 		});
 	}
 
