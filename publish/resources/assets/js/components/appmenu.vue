@@ -1,15 +1,15 @@
 <template>
-  <ul class="appmenu">
+  <ul class="appmenu" :style="{display: (depth==1)?'block':'none'}">
 	<li v-for="(item,i) in menus">
-		<i v-if="item.items && item.open" class="glyphicon glyphicon-menu-down"></i>
-		<i v-if="item.items && !item.open" class="glyphicon glyphicon-menu-right"></i>
-		<a v-if="item.items" v-on:click="toggle(i, $event)">{{item.label}}</a>
-		<a v-else v-bind:href="item.link" target="window">{{item.label}}</a>
-		<ul v-if="item.items" v-show="item.open">
-			<li v-for="item in item.items">
-				<a v-if="item.label" v-bind:href="item.link" target="window">{{item.label}}</a>
-			</li>
-		</ul>
+		<i :style="{'padding-left': ((depth-1)*deprem)+'rem'}" 
+			v-if="item.items && item.open" class="icon glyphicon glyphicon-triangle-bottom"></i>
+		<i :style="{'padding-left': ((depth-1)*deprem)+'rem'}"
+			v-if="item.items && !item.open" class="icon glyphicon glyphicon-triangle-right"></i>
+		<a :style="{'padding-left': (depth*deprem)+'rem'}" 
+			v-if="item.items" v-on:click="toggle(i, $event)">{{item.label}}</a>
+		<a :style="{'padding-left': (depth*deprem)+'rem'}"
+			v-else v-bind:href="item.link" target="window">{{item.label}}</a>
+		<appmenu :level="depth+1" :menus="item.items"></appmenu>
 	</li>
   </ul>
 </template>
@@ -20,22 +20,20 @@ $menu-border-color: rgba(255, 255, 255, 0.5);
 $menu-hover-color: rgba(255, 255, 255, 0.3);
 $menu-fg-color: #ccc;
 $menu-label-height: 3.5rem;
-$menu-item-height: 2.5rem;
+$menu-icon-color: $menu-fg-color;
 
 ul.appmenu{
 	margin:0;
 	padding:0;
-	border-top:1px solid $menu-border-color;
 
 	a,  a:hover{
 		text-decoration: none;
 	}
 
 	>li{
-		border-bottom:1px solid $menu-border-color;
+		position: relative;
 
 		>a{
-			padding-left: 2rem;
 			line-height: $menu-label-height;
 			height: $menu-label-height;
 			display: block;
@@ -44,31 +42,18 @@ ul.appmenu{
 			z-index: 50;
 		}
 
-		>a:hover, >ul>li>a:hover{
+		>a:hover{
 			background: $menu-hover-color;
 		}
 
-		>ul{
-			margin:0;
-			padding:0;
-			border-top:1px solid $menu-border-color;
-			z-index: 0;
-		}
-
-		>i{
-			float: right;
+		>.icon{
+			position: absolute;
+			color: $menu-icon-color;
+			height: $menu-label-height;
 			line-height: $menu-label-height;
-			margin-right:1.5rem;
+			width: 2rem;
+			text-align: center;
 		}
-
-		>ul>li>a{
-			display: block;
-			padding: 0 0 0 3rem;
-			cursor: pointer;
-			color: $menu-fg-color;
-			height: $menu-item-height;
-			line-height: $menu-item-height;
-		}		
 	}
 
 	li{
@@ -80,7 +65,17 @@ ul.appmenu{
 
 <script>
 export default {
-	props: ["menus"],
+	props: ["menus", "level"],
+	computed: {
+		depth(){
+			return this.level || 1;
+		}
+	},
+	data (){
+		return {
+			"deprem": 2.5
+		}
+	},
 	methods: {
 		toggle (i, e){
 			var that = this;

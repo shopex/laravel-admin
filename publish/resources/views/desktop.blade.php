@@ -49,7 +49,7 @@
     window.searchbar = [];
     @endif;
 
-    window.menus = {!! json_encode($app_menus) !!};
+    window.menus = {!! json_encode((new Shopex\LubanAdmin\Permission\Menu())->show($app_menus)) !!};
 
     new Vue({
         el: '#app',

@@ -28,7 +28,7 @@ class CheckPermission
         return response([
             'error' => [
                 'code' => 'INSUFFICIENT_ROLE',
-                'description' => 'You are not authorized to access this resource.',
+                'description' => '您无权访问本页面',
             ],
         ], 401);
     }

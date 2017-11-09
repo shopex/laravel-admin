@@ -6,27 +6,44 @@ use App\Http\Controllers\Controller;
 use App\Role;
 use Illuminate\Http\Request;
 use Session;
-
+use Shopex\LubanAdmin\Finder;
+use Shopex\LubanAdmin\Permission\Configs;
 class RolesController extends Controller
 {
+    public function __construct()
+    {
+        $config = new Configs();
+        $data = $config->getRouterPermission();
+        view()->share("data",$data);
+    }
     /**
      * Display a listing of the resource.
      *
-     * @return void
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
-        $keyword = $request->get('search');
-        $perPage = 15;
+        $dataSet = Role::class;
 
-        if (!empty($keyword)) {
-            $roles = Role::where('name', 'LIKE', "%$keyword%")->orWhere('label', 'LIKE', "%$keyword%")
-                ->paginate($perPage);
-        } else {
-            $roles = Role::paginate($perPage);
-        }
+        $finder = Finder::create($dataSet, '角色列表')
+                    ->setId('id')
+                    ->addAction('新建角色', [$this, 'create'])
+                    ->addSort('按修改时间倒排', 'created_at', 'desc')
+                    ->addSort('按修改时间正排', 'created_at')
+                    ->addBatchAction('删除', [$this, 'destroy'])
+                    ->addColumn('操作', 'id')->modifier(function($id){
+                        return '<a href="'.url("/admin/roles/$id/edit").' " title="编辑"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>编辑</button></a>';
+                    })->html(true)
+                    ->addColumn('名称', 'name')
+                    ->addColumn('标签', 'label')
+                    
+                    ->addSearch('名称', 'name', 'string')
+                    ->addSearch('标签', 'label', 'string')
+                    
+                    ->addTab("全部", [])
+                    ->addInfoPanel('基本信息', [$this, 'detail']);
 
-        return view('admin::roles.index', compact('roles'));
+        return $finder->view();
     }
 
     /**
@@ -36,7 +53,7 @@ class RolesController extends Controller
      */
     public function create()
     {
-        return view('admin::roles.create');
+        return view('admin::roles.create',compact('data'));
     }
 
     /**
@@ -49,8 +66,9 @@ class RolesController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, ['name' => 'required']);
-
-        Role::create($request->all());
+        $data = $request->all();
+        $data['permissions'] = json_encode($data['permissions']);
+        Role::create($data);
 
         Session::flash('flash_message', 'Role added!');
 
@@ -67,7 +85,7 @@ class RolesController extends Controller
     public function show($id)
     {
         $role = Role::findOrFail($id);
-
+        $role->permissions = json_decode($role->permissions,1);
         return view('admin::roles.show', compact('role'));
     }
 
@@ -81,7 +99,7 @@ class RolesController extends Controller
     public function edit($id)
     {
         $role = Role::findOrFail($id);
-
+        $role->permissions = json_decode($role->permissions,1);
         return view('admin::roles.edit', compact('role'));
     }
 
@@ -98,7 +116,9 @@ class RolesController extends Controller
         $this->validate($request, ['name' => 'required']);
 
         $role = Role::findOrFail($id);
-        $role->update($request->all());
+        $data = $request->all();
+        $data['permissions'] = json_encode($data['permissions']);
+        $role->update($data);
 
         Session::flash('flash_message', 'Role updated!');
 
