@@ -11,7 +11,7 @@
 					{{title}}
 				</div>
 				<div class="w-pin" 
-					:class="{active: is_pin}"
+					:class="{active: is_pin && !is_max}"
 					@click="is_pin=!is_pin">
 					<i class="glyphicon glyphicon-pushpin"></i>
 				</div>
@@ -42,6 +42,29 @@
 </template>
 
 <style scoped>
+
+.w-body >>> .error-page{
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	top: 0;
+	overflow: auto;
+}
+
+.w-body >>> .error-page h1{
+	font-size: 3rem;
+}
+.w-body >>> .error-page h2{
+	font-size: 2rem;
+}
+.w-body >>> .error-page h3{
+	font-size: 1.5rem;
+}
+.w-body >>> .error-page svg{
+	display: none;
+}
+
 .w-ground{
 	position: absolute;
 	left:0;
@@ -114,7 +137,7 @@
 	width: 1rem;
 	height: 1rem;
 }
-.w-icons.deactive i::before{
+.w-icons i::before{
 	content: '';
 }
 .w-icons .ico-min, .w-icons .ico-max, .w-icons .ico-close{
@@ -171,7 +194,7 @@
 
 <script>
 export default {
-	props: ["left", "top", "zindex", "isfocus", "initwidth", "initheight", "id", "url"],
+	props: ["left", "top", "zindex", "isfocus", "initwidth", "initheight", "id", "initurl", "initmax"],
 	data() {
 		return {
 			width: 640,
@@ -184,6 +207,7 @@ export default {
 			is_max: false,
 			is_min: false,
 			is_pin: false,
+			url: "",
 			icon_hover: false,
 			title: "",
 			child: [],
@@ -200,6 +224,8 @@ export default {
 		this.win.css('left', this.left);
 		this.win.css('top', this.top);
 
+		this.is_max = this.initmax;
+
 		this.width = this.initwidth;
 		this.height = this.initheight;
 
@@ -211,15 +237,30 @@ export default {
 		this.$watch('is_pin', function(){
 			that.$emit('pin', that.id, that.is_pin);
 		});
+		this.$watch('is_max', function(){
+			that.$emit('max', that.id, that.is_max);
+		});
 
 		this.title = "title";
-		if(this.url){
-			this.load(this.url);
+		if(this.initurl){
+			this.load(this.initurl);
+			this.url = this.initurl;
+		}
+
+		this.$watch('url', function(){
+			that.$emit('url', that.id, that.url);
+		});		
+
+		if(this.is_max){
+			this.max();
 		}
 	},
 	methods: {
 		link_action(ev){
 			var el = this.find_el(ev.target, 'A', 3);
+			if($(el).hasClass('external')){
+				return;
+			}
 			if(el && (!$(el).attr('target') || $(el).attr('target')=='window')){
 				var url = $(el).attr('href');
 				if(url){
@@ -230,9 +271,18 @@ export default {
 			}
 		},
 		form_action(ev){
-			console.info(ev);
+			var el = $(ev.target);
+			if(el.hasClass('external')){
+				return;
+			}
+
+			var url = el.attr('action') || this.url;
 			ev.stopPropagation();
 	        ev.preventDefault();
+			this.load(url, {
+				method: el.attr('method') || "POST",
+				data: el.serialize()
+			});	        
 		},
 		find_el(el, tag, n){
 			if(el.tagName==tag){
@@ -243,12 +293,10 @@ export default {
 				return false;
 			}
 		},		
-		load(url){
+		load(url, options){
 			var that = this;
-			$.ajax({
-				url: url,
-				method: 'get',
-				success: function(data){
+			options = options || {};
+			options.success = function(data){
 					var el = $('<div></div>').html(data);
 					that.title = $('meta[name="page-title"]', el).attr('content');
 					$('meta[name="page-title"]').attr('content', $('meta[name="csrf-token"]', el).attr('content'));
@@ -274,13 +322,26 @@ export default {
 						for(var i in window.Vue){
 							Vue[i] = window.Vue[i];
 						}
-
-						for(var i=0; i<scripts.length; i++){
-							eval(scripts[i].innerHTML);
+						try{
+							for(var i=0; i<scripts.length; i++){
+								eval(scripts[i].innerHTML);
+							}
+						}catch(e){
+							console && console.error(scripts[i].innerHTML);
 						}
 					})();
+				};
+			options.error = function(rsp){
+				if(rsp.readyState==4){
+					var el = $('<div class="error-page"></div>').html(rsp.responseText);
+					var content = $('.container' , el);
+					el.empty().append(content);
+					that.body.empty().append(el);
 				}
-			});
+			}
+			options.method = options.method || "GET";
+			options.url = url;
+			$.ajax(options);
 		},
 		max(){
 			var that = this;

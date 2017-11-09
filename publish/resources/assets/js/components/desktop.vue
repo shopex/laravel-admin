@@ -45,11 +45,14 @@
 						:top="win.top"
 						:initwidth="win.width"
 						:initheight="win.height"
-						:zindex="(win.is_pin?500:10)+win.zindex"
+						:zindex="((win.is_pin && !win.is_max)?500:10)+win.zindex"
 						:isfocus="win.isfocus"
 						:id="win.id"
-						:url="win.url"
+						:initurl="win.url"
+						:initmax="win.is_max"
+						@max="onMaxChange"
 						@pin="pin"
+						@url="onUrlChange"						
 						@min="win.is_min=true;setLayers()"
 						@focus="active(win.id)"
 						@close="close(win.id)"
@@ -80,11 +83,13 @@
 $topbar-height: 3rem;
 $topbar-bg: #fff;
 $topbar-active-bg: #f0f0f0;
-$sidebar-bg: #002833;
+$sidebar-bg: linear-gradient(45deg, #0f1e48, #1d6d7d);
 $sidebar-fg: #fff;
 $topbar-icons-width: 10rem;
 $sidebar-width: 20rem;
 $task-item-width: 10rem;
+$taskbar-border-color: #ccc;
+$taskbar-border-active-color: #1d6d7d;
 
 .desktop{
 	display: flex;
@@ -170,16 +175,18 @@ $task-item-width: 10rem;
 		display: flex;
 		align-items: center;
 		white-space: nowrap;
+		border-top: 3px solid $taskbar-border-color;
 		max-width: $task-item-width;
 	}
 	.active .taskbar-item-title{
 		background: $topbar-active-bg;
 		cursor: default;
+		border-color: $taskbar-border-active-color;
 	}
 	.taskbar-item-split{
 		flex: 1px 0;
-		background: #aaa;
-		margin: 5px 3px;
+		background: transparent;
+		margin: 5px 2px;
 	}
 	.icons{
 		position: absolute;
@@ -242,6 +249,7 @@ $task-item-width: 10rem;
 		padding: 1rem;
 		text-align: center;
 		font-size: 0.8rem;
+		color: #ccc;
 	}
 }
 </style>
@@ -290,6 +298,7 @@ export default {
 				title: "",
 				is_min: false,
 				is_pin: false,
+				is_max: true,
 				url: url
 			};
 
@@ -359,6 +368,12 @@ export default {
 			if(this.windows[id].isfocus){
 				this.updateTitle(this.windows[id]);
 			}
+		},
+		onMaxChange(id, is_max){
+			this.windows[id].is_max = is_max;
+		},
+		onUrlChange(id, url){
+			this.windows[id].url = url;
 		}
 	}
 }
