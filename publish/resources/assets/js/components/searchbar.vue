@@ -1,13 +1,13 @@
 <template>
 
-<div class="admin-header-searchbar">
+<div class="searchbar">
 	<div class="dropdown" v-bind:class="{'open': (show && options_filter.length>0)}">
+		<i class="glyphicon glyphicon-search search-icon"></i>
 		<input type="text" 
 			v-on:focus="display"
 			v-on:blur="blur"
 			v-on:keyup="keyup($event)"
 			v-model="value"
-			style="width:25rem"
 			/>
 	  	<div class="search-opts dropdown-menu">
 	      	<a v-bind:class="{'selected': selected==idx}"
@@ -24,36 +24,52 @@
 
 </template>
 
-<style>
-.search-form{position: relative}
-.search-form .dropdown-menu{display:none;}
-.search-opts{
-	min-height:20rem;
-	min-width:25rem;
-}
-.search-opts a{line-height:2rem; display: block;padding:0.5rem; text-decoration: none; color:#666;}
-.search-opts a:hover{background: $component-active-bg; color:$component-active-color;}
-.search-opts a.selected{
-	background: #000;
-	color: #fff;
-}
-.search-panel-footer{
-	border-top:1px solid #ccc; 
-	margin:0 10px; 
-	padding:10px 0 5px 0;
-	text-align: right;
-}
+<style scoped lang="scss">
+.searchbar{
 
-.admin-header-searchbar input{
-	line-height: 2.4rem;
-	padding:0 0.5rem;
-	background: transparent;
-	border:1px solid #ccc;
-}
+	padding: 0.5rem;
 
-.admin-header-searchbar > .dropdown{
-	line-height: 2.4rem;
-	margin:1.3rem 0;
+	.search-icon{
+		line-height: 2.4rem;
+		position: absolute;
+		left: 0.6rem;
+	}
+	input{
+		padding:0 0.5rem;		
+		padding-left: 2.2rem;
+		width: 100%;
+		line-height: 2.4rem;
+		background: transparent;
+		border:1px solid rgba(255, 255, 255, 0.4);
+		border-radius: 0.5rem;
+	}
+	.dropdown{
+		line-height: 2.4rem;
+	}
+	.search-form{position: relative}
+	.search-form .dropdown-menu{display:none;}
+	.search-opts{
+		min-height:20rem;
+		min-width:25rem;
+	}
+	.search-opts a{
+		line-height:2rem; 
+		display: block;padding:0.5rem; 
+		text-decoration: none; 
+		color:#666;
+	}
+	.search-opts a:hover{
+	}
+	.search-opts a.selected{
+		background: #000;
+		color: #fff;
+	}
+	.search-panel-footer{
+		border-top:1px solid #ccc; 
+		margin:0 10px; 
+		padding:10px 0 5px 0;
+		text-align: right;
+	}
 }
 </style>
 

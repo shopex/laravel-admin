@@ -11,28 +11,37 @@ class Admin{
 	private $objectInputs = [];
 
 	public function routes(){
-		
-		Route::resource('admin/roles', 'Admin\\RolesController');
-		Route::resource('admin/users', 'Admin\\UsersController');
-		Route::Group(['prefix'=>'admin/generator'],function(){
-			Route::get('/',[
-					'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@index',
-					'as'=>'admin.generator.index'
-				]);
-			Route::post('/',[
-				'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@postGenerator',
-				'as'=>'admin.generator.post'
-			]);
-			Route::get('/new',[
-					'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@getGenerator',
-					'as'=>'admin.generator.index',
-				]);
-			Route::get('{id}/edit',[
-					'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@edit',
-					'as'=>'admin.generator.edit'
-				]);
+		Route::group(['middleware' => 'auth'], function () {
+	        Route::get('admin/desktop', ['as'=>'admin.desktop', function () {
+	        	            return view('admin::desktop');
+	        	        }]);
+			Route::any('admin/component/objectinput/{type}', ['uses' => '\Shopex\LubanAdmin\Controllers\ComponentController@objectInput']);
 		});
-		Route::any('admin/component/objectinput/{type}', ['uses' => '\Shopex\LubanAdmin\Controllers\ComponentController@objectInput']);
+	}
+
+	public function super_routes(){
+		Route::group(['middleware' => 'auth'], function () {
+			Route::resource('admin/roles', 'Admin\\RolesController');
+			Route::resource('admin/users', 'Admin\\UsersController');
+			Route::Group(['prefix'=>'admin/generator'],function(){
+				Route::get('/',[
+						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@index',
+						'as'=>'admin.generator.index'
+					]);
+				Route::post('/',[
+					'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@postGenerator',
+					'as'=>'admin.generator.post'
+				]);
+				Route::get('/new',[
+						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@getGenerator',
+						'as'=>'admin.generator.index',
+					]);
+				Route::get('{id}/edit',[
+						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@edit',
+						'as'=>'admin.generator.edit'
+					]);
+			});
+		});
 	}
 
 	public function api_routes(){

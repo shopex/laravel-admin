@@ -1,7 +1,7 @@
 require('./modaltarget');
 
-Vue.component('desktop', require('./components/appmenu'));
-Vue.component('window', require('./components/appmenu'));
+Vue.component('desktop', require('./components/desktop'));
+Vue.component('window', require('./components/window'));
 Vue.component('searchbar', require('./components/searchbar'));
 Vue.component('appsel', require('./components/appsel'));
 Vue.component('filters', require('./components/filters'));

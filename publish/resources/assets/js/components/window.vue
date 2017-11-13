@@ -10,14 +10,25 @@
 					@mousedown="start_drag($event, 1)">
 					{{title}}
 				</div>
-				<div class="w-icons">
+				<div class="w-pin" 
+					:class="{active: is_pin && !is_max}"
+					@click="is_pin=!is_pin">
+					<i class="glyphicon glyphicon-pushpin"></i>
+				</div>
+				<div class="w-icons" 
+					:class="{deactive: !icon_hover}"
+					@mouseover="icon_hover=true" 
+					@mouseout="icon_hover=false">
 					<i class="ico-min glyphicon glyphicon-minus" @click="min()"></i>
 					<i v-if="is_max" @click="normal()" class="ico-max glyphicon glyphicon-unchecked"></i>
 					<i v-else @click="max()" class="ico-max glyphicon glyphicon-unchecked"></i>					
 					<i v-if="closeAble" @click="$emit('close')" class="ico-close glyphicon glyphicon-remove"></i>
 				</div>
 			</div>
-			<div class="w-body" ref="body" v-bind:style="{
+			<div class="w-body" ref="body" 
+			 	@click="link_action" 
+			 	@submit="form_action"
+				v-bind:style="{
 					width: width+'px',
 					height: height+'px'
 				}">
@@ -31,6 +42,29 @@
 </template>
 
 <style scoped>
+
+.w-body >>> .error-page{
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	top: 0;
+	overflow: auto;
+}
+
+.w-body >>> .error-page h1{
+	font-size: 3rem;
+}
+.w-body >>> .error-page h2{
+	font-size: 2rem;
+}
+.w-body >>> .error-page h3{
+	font-size: 1.5rem;
+}
+.w-body >>> .error-page svg{
+	display: none;
+}
+
 .w-ground{
 	position: absolute;
 	left:0;
@@ -42,7 +76,6 @@
 	background: #f0f0f0;
 	position: absolute;
 	border-radius: 5px;
-	overflow: hidden;
 	box-shadow:0px 0px 8px rgba(0,0,0,0.5);
 }
 .w-box.is_max{
@@ -63,10 +96,13 @@
 	font-weight: bold;
 }
 .w-icons{
-	flex:8rem 0;
+	flex:0 0;
+	margin-left: 1rem;
+	padding-left: 1rem;
 	text-align: right;
 	line-height: 2.5rem;
 	padding-right:1rem;
+	white-space: pre;
 }
 .w-head{
 	display: flex;
@@ -78,23 +114,46 @@
 	-ms-user-select: none;
 	user-select: none;		
 }
+.w-pin{
+	line-height: 2.5rem;
+	cursor: pointer;
+}
+.w-pin i{
+	color: #ccc;
+}
+.w-pin.active i{
+	color: red;
+	text-shadow:2px 2px 3px rgba(0,0,0,0.5);	
+}
 .focus .w-head{
 	color: #000;
+}
+.w-icons i{
+	background: #ccc;
+	border-radius: 100%;
+	font-size: 0.3rem;
+	display: inline-block;
+	color: #333;
+	width: 1rem;
+	height: 1rem;
+}
+.w-icons i::before{
+	content: '';
 }
 .w-icons .ico-min, .w-icons .ico-max, .w-icons .ico-close{
 	cursor: pointer;
 }
 .focus .w-icons .ico-min{
-	color: #ffbe2e;
+	background: #ffbe2e;
 }
 .focus .w-icons .ico-max{
-	color: #2bca41;
+	background: #2bca41;
 }
 .focus .w-icons .ico-close{
-	color: #ff6058;
+	background: #ff6058;
 }
 .is_max .w-icons .ico-min,.is_max  .w-icons .ico-max,.is_max  .w-icons .ico-close{
-	color: #ccc;
+	background: #ccc;
 }
 .w-mask{
 	position: absolute;
@@ -135,7 +194,7 @@
 
 <script>
 export default {
-	props: ["left", "top", "zindex", "isfocus", "initwidth", "initheight", "id"],
+	props: ["left", "top", "zindex", "isfocus", "initwidth", "initheight", "id", "initurl", "initmax"],
 	data() {
 		return {
 			width: 640,
@@ -147,6 +206,9 @@ export default {
 			is_model: false,
 			is_max: false,
 			is_min: false,
+			is_pin: false,
+			url: "",
+			icon_hover: false,
 			title: "",
 			child: [],
 			draging: {},
@@ -162,6 +224,8 @@ export default {
 		this.win.css('left', this.left);
 		this.win.css('top', this.top);
 
+		this.is_max = this.initmax;
+
 		this.width = this.initwidth;
 		this.height = this.initheight;
 
@@ -170,20 +234,114 @@ export default {
 		this.$watch('title', function(){
 			that.$emit('title', that.id, that.title);
 		});
+		this.$watch('is_pin', function(){
+			that.$emit('pin', that.id, that.is_pin);
+		});
+		this.$watch('is_max', function(){
+			that.$emit('max', that.id, that.is_max);
+		});
 
 		this.title = "title";
+		if(this.initurl){
+			this.load(this.initurl);
+			this.url = this.initurl;
+		}
+
+		this.$watch('url', function(){
+			that.$emit('url', that.id, that.url);
+		});		
+
+		if(this.is_max){
+			this.max();
+		}
 	},
 	methods: {
-		load(url){
-			var that = this;
-			$.ajax({
-				url: url,
-				method: 'get',
-				success: function(data){
-					var el = $('<div></div>').html(data);
-					that.body.empty().append($('.main-content', el));
+		link_action(ev){
+			var el = this.find_el(ev.target, 'A', 3);
+			if($(el).hasClass('external')){
+				return;
+			}
+			if(el && (!$(el).attr('target') || $(el).attr('target')=='window')){
+				var url = $(el).attr('href');
+				if(url){
+					ev.stopPropagation();
+			        ev.preventDefault();
+					this.load(url);
 				}
-			});
+			}
+		},
+		form_action(ev){
+			var el = $(ev.target);
+			if(el.hasClass('external')){
+				return;
+			}
+
+			var url = el.attr('action') || this.url;
+			ev.stopPropagation();
+	        ev.preventDefault();
+			this.load(url, {
+				method: el.attr('method') || "POST",
+				data: el.serialize()
+			});	        
+		},
+		find_el(el, tag, n){
+			if(el.tagName==tag){
+				return el;
+			}else if(n!=0){
+				return this.find_el(el.parentNode, tag, n-1);
+			}else{
+				return false;
+			}
+		},		
+		load(url, options){
+			var that = this;
+			options = options || {};
+			options.success = function(data){
+					var el = $('<div></div>').html(data);
+					that.title = $('meta[name="page-title"]', el).attr('content');
+					$('meta[name="page-title"]').attr('content', $('meta[name="csrf-token"]', el).attr('content'));
+
+					var content = $('.main-content', el);
+					var scripts = $('script', content).remove();
+					that.body.empty().append(content);
+
+					(function(){
+
+						var $ = function(s,c,r){
+							c = c || that.$refs.body;
+							return jQuery.fn.init(s, c, r);
+						}
+
+						var Vue = function(options){
+							if(typeof options.el == 'string'){
+								options.el = $(options.el, that.$refs.body)[0];
+							}
+							return new window.Vue(options);
+						}
+						Vue.prototype=window.Vue;
+						for(var i in window.Vue){
+							Vue[i] = window.Vue[i];
+						}
+						try{
+							for(var i=0; i<scripts.length; i++){
+								eval(scripts[i].innerHTML);
+							}
+						}catch(e){
+							console && console.error(scripts[i].innerHTML);
+						}
+					})();
+				};
+			options.error = function(rsp){
+				if(rsp.readyState==4){
+					var el = $('<div class="error-page"></div>').html(rsp.responseText);
+					var content = $('.container' , el);
+					el.empty().append(content);
+					that.body.empty().append(el);
+				}
+			}
+			options.method = options.method || "GET";
+			options.url = url;
+			$.ajax(options);
 		},
 		max(){
 			var that = this;

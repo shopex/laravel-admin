@@ -1,7 +1,7 @@
 <template>
 <span class="dropdown">
   <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="glyphicon glyphicon-th"></i>
+    <i class="glyphicon glyphicon-globe topbar-icon"></i>
   </a>
   <ul class="dropdown-menu dropdown-menu-right app-sel">
     <li v-for="item in items">

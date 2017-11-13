@@ -1,13 +1,16 @@
 <template>
-	<div v-bind:class="{unselectable: draging}" class="desktop">
+	<div v-bind:class="{unselectable: draging}" class="desktop" @click="link_action">
 
 		<div class="sidepanel">
-			<h1 class="title">logo</h1>
+			<h1 class="brand">logo</h1>
 			<div class="searchbar">
 				<searchbar :items="search"></searchbar>
 			</div>
 			<div class="menus">
-				<button @click="open()">start</button>
+				<appmenu :menus="menus"></appmenu>
+			</div>
+			<div class="copyright">
+				<slot name="copyright"></slot>
 			</div>
 		</div>
 
@@ -29,7 +32,9 @@
 						<span class="taskbar-item-split"></span>
 					</div>
 				</transition-group>
-				<div class="icons">icons</div>
+				<div class="icons">
+					<slot name="topbar"></slot>
+				</div>
 				<div class="topbar-shadow"></div>
 			</div>
 
@@ -40,9 +45,14 @@
 						:top="win.top"
 						:initwidth="win.width"
 						:initheight="win.height"
-						:zindex="10+win.zindex"
+						:zindex="((win.is_pin && !win.is_max)?500:10)+win.zindex"
 						:isfocus="win.isfocus"
 						:id="win.id"
+						:initurl="win.url"
+						:initmax="win.is_max"
+						@max="onMaxChange"
+						@pin="pin"
+						@url="onUrlChange"						
 						@min="win.is_min=true;setLayers()"
 						@focus="active(win.id)"
 						@close="close(win.id)"
@@ -56,13 +66,30 @@
 		<div class="background"></div>
 	</div>
 </template>
+
+<style scoped>
+.topbar >>> a, .topbar >>> a:hover{
+	text-decoration: none;
+	color: #333; 
+}
+.topbar >>> .topbar-icon{
+	font-size: 150%;
+	line-height: 3rem;
+	margin-right: 1rem
+}
+</style>
+
 <style scoped lang="scss">
 $topbar-height: 3rem;
 $topbar-bg: #fff;
 $topbar-active-bg: #f0f0f0;
-$sidebar-bg: #002833;
+$sidebar-bg: linear-gradient(45deg, #0f1e48, #1d6d7d);
 $sidebar-fg: #fff;
 $topbar-icons-width: 10rem;
+$sidebar-width: 20rem;
+$task-item-width: 10rem;
+$taskbar-border-color: #ccc;
+$taskbar-border-active-color: #1d6d7d;
 
 .desktop{
 	display: flex;
@@ -71,6 +98,7 @@ $topbar-icons-width: 10rem;
 	left: 0;
 	right: 0;
 	bottom: 0;
+	overflow: hidden;
 
 	.background{
 		z-index: -99;
@@ -79,7 +107,7 @@ $topbar-icons-width: 10rem;
 		right:0;
 		top:0;
 		bottom: 0;
-	}	
+	}
 }
 
 .taskbar-enter-active, .taskbar-leave-active {
@@ -135,25 +163,30 @@ $topbar-icons-width: 10rem;
 		height: $topbar-height;
 	}
 	.taskbar-item{
-		flex: 10rem 0;
+		flex: $task-item-width 0;
 		display: flex;
 	}
 	.taskbar-item-title{
 		flex: 1 1;
 		padding: 0 0.5rem;
 		overflow: hidden;
+		text-overflow: ellipsis;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
+		white-space: nowrap;
+		border-top: 3px solid $taskbar-border-color;
+		max-width: $task-item-width;
 	}
 	.active .taskbar-item-title{
 		background: $topbar-active-bg;
 		cursor: default;
+		border-color: $taskbar-border-active-color;
 	}
 	.taskbar-item-split{
 		flex: 1px 0;
-		background: #ccc;
-		margin: 5px 0;
+		background: transparent;
+		margin: 5px 2px;
 	}
 	.icons{
 		position: absolute;
@@ -186,9 +219,8 @@ $topbar-icons-width: 10rem;
 .sidepanel{
 	background: $sidebar-bg;
 	border-right:1px solid #ccc;
-	flex: 20rem 0;
+	flex: $sidebar-width 0;
 	color: sidebar-fg;
-	padding: 8px;
 	display: flex;
 	flex-direction: column;
 
@@ -197,16 +229,27 @@ $topbar-icons-width: 10rem;
 		border: 1px solid rgba(255,255,255, 0.5);
 	}
 
-	.title{
+	.brand{
 		flex: 4rem 0;
+		text-align: center;
+		color: #f0f0f0;
 	}
 
 	.searchbar{
 		flex: 3rem 0;
+		padding-bottom: 1rem;
 	}
 
 	.menus{
 		flex: 1 1;
+	}
+
+	.copyright{
+		flex: 1rem 0;
+		padding: 1rem;
+		text-align: center;
+		font-size: 0.8rem;
+		color: #ccc;
 	}
 }
 </style>
@@ -218,22 +261,45 @@ export default {
 		return {
 			draging: false,
 			win_id: 0,
+			title: "",
 			windows: {},
 			layers: []
 		}
 	},
 	mounted(){
 		this.$watch('layers', this.setLayers);
+		this.title = document.title;
+		window.$desktop = this;
 	},
 	methods: {
-		open() {
+		link_action(ev){
+			var el = this.find_el(ev.target, 'A', 3);
+			if(el && $(el).attr('target')=='window'){
+				this.open($(el).attr('href'));
+				ev.stopPropagation();
+		        ev.preventDefault();
+			}
+		},
+		find_el(el, tag, n){
+			if(el.tagName==tag){
+				return el;
+			}else if(n!=0){
+				return this.find_el(el.parentNode, tag, n-1);
+			}else{
+				return false;
+			}
+		},
+		open(url) {
 			var win = {
 				id: this.win_id++,
 				width: 640,
 				height: 480,
 				zindex: 0,
 				title: "",
-				is_min: false
+				is_min: false,
+				is_pin: false,
+				is_max: true,
+				url: url
 			};
 
 			win.left = 20 + ($(this.$refs.workspace).width() - win.width - 20) * Math.random();
@@ -241,6 +307,9 @@ export default {
 
 			this.layers.push(win.id);
 			this.$set(this.windows, win.id, win);
+		},
+		pin(id, is_pin){
+			this.windows[id].is_pin = is_pin;
 		},
 		active(id){
 			this.layers = this.delete(this.layers, id);
@@ -283,8 +352,12 @@ export default {
 				}
 			}
 			if(last_show){
+				this.updateTitle(last_show);
 				last_show.isfocus = true;
 			}
+		},
+		updateTitle(win){
+			document.title = win.title? ( win.title + ' - ' + this.title ) : this.title;
 		},
 		close(id){
 			this.layers = this.delete(this.layers, id);
@@ -292,6 +365,15 @@ export default {
 		},
 		onTitleChange(id, title){
 			this.windows[id].title = title;
+			if(this.windows[id].isfocus){
+				this.updateTitle(this.windows[id]);
+			}
+		},
+		onMaxChange(id, is_max){
+			this.windows[id].is_max = is_max;
+		},
+		onUrlChange(id, url){
+			this.windows[id].url = url;
 		}
 	}
 }
