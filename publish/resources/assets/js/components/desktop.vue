@@ -24,9 +24,8 @@
 						:class="{active: win.isfocus}"
 						:key="win.id">
 						<span class="taskbar-item-title"
-								@click="show(win.id)"
-								@click.middle="close(win.id)"
-								@click.right="console.info($event)">
+								@click.prevent="show(win.id)"
+								@mouseup.middle.prevent="close(win.id)">
 							{{win.title}}
 						</span>
 						<span class="taskbar-item-split"></span>
