@@ -11,7 +11,7 @@ class Role extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'label','permissions'];
+    protected $fillable = ['name', 'label', 'permissions', 'datas'];
 
     /**
      * A role may be given various permissions.
@@ -21,9 +21,16 @@ class Role extends Model
     public function permissions()
     {
         return json_decode($this->permissions,1);
-        // return $this->belongsToMany(Permission::class);
     }
-
+    public function datas()
+    {
+        return json_decode($this->datas,1);
+    }
+    public function init(){
+        $this->permissions  = json_decode($this->permissions,1);
+        $this->datas        = json_decode($this->datas,1);
+        // return $this;
+    }
     /**
      * Grant the given permission to a role.
      *

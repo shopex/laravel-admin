@@ -8,7 +8,7 @@ class Check
 	private $perKv = [];
 	public function prcessPermission(){
 		$config = new Configs();
-		$permissions = $config->getRouterPermission();
+		$permissions = $config->getPermission('router');
 		$this->perKv = [];
 		foreach ($permissions as $group) {
 		 	foreach ($group['permissions'] as $code => $info) {

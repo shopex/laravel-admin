@@ -1,0 +1,59 @@
+122-array (
+  '_method' => 'PATCH',
+  '_token' => 'F9GyDhHcIQdbARzJdbhPf5vR5J96uTWRhoCHTJLm',
+  'name' => 'admin',
+  'label' => 'admin',
+  'permissions' => 
+  array (
+    0 => 'users.list',
+    1 => 'users.deteil',
+    2 => 'roles.list',
+    3 => 'roles.add',
+    4 => 'roles.deteil',
+    5 => 'roles.update',
+    6 => 'roles.delete',
+    7 => 'admin.generator.create',
+    8 => 'admin.generator.list',
+    9 => 'admin.generator.edit',
+  ),
+  'models' => 
+  array (
+    'App\\Goods' => 
+    array (
+      'row' => 
+      array (
+        0 => 'creater',
+        1 => 'shop_id',
+        2 => 'cat_id',
+      ),
+      'type' => 'or',
+    ),
+  ),
+)
+125-array (
+  '_method' => 'PATCH',
+  '_token' => 'F9GyDhHcIQdbARzJdbhPf5vR5J96uTWRhoCHTJLm',
+  'name' => 'admin',
+  'label' => 'admin',
+  'permissions' => '["users.list","users.deteil","roles.list","roles.add","roles.deteil","roles.update","roles.delete","admin.generator.create","admin.generator.list","admin.generator.edit"]',
+  'models' => 
+  array (
+    'App\\Goods' => 
+    array (
+      'row' => 
+      array (
+        0 => 'creater',
+        1 => 'shop_id',
+      ),
+    ),
+  ),
+  'datas' => '{"App\\\\Goods":{"type":"or"}}',
+)
+125-array (
+  '_method' => 'PATCH',
+  '_token' => 'F9GyDhHcIQdbARzJdbhPf5vR5J96uTWRhoCHTJLm',
+  'name' => 'admin',
+  'label' => 'admin',
+  'permissions' => '["users.list","users.deteil","roles.list","roles.add","roles.deteil","roles.update","roles.delete","admin.generator.create","admin.generator.list","admin.generator.edit"]',
+  'datas' => '{"App\\\\Goods":{"row":["creater","shop_id","cat_id"],"type":"or"}}',
+)
