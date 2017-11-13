@@ -249,7 +249,9 @@ export default {
 
 		this.$watch('url', function(){
 			that.$emit('url', that.id, that.url);
-		});		
+		});
+
+		$(window).on('resize', this.on_resize);
 
 		if(this.is_max){
 			this.max();
@@ -361,11 +363,14 @@ export default {
 					width: that.width,
 					height: that.height
 				};
-				that.win.css('left', 0);
-				that.win.css('top', 0);
-				that.width = $(that.$el).width();
-				that.height = $(that.$el).height() - $(that.$refs.title).height();
+				that.full();
 			});
+		},
+		full(){
+			this.win.css('left', 0);
+			this.win.css('top', 0);
+			this.width = $(this.$el).width();
+			this.height = $(this.$el).height() - $(this.$refs.title).height();
 		},
 		taskbarOffset(){
 			var taskbar = $('#taskbar-'+this.id);
@@ -526,6 +531,11 @@ export default {
 			}
 			this.draging = {};
 			this.$emit('dragend');	
+		},
+		on_resize(e){
+			if(this.is_max){
+				this.full();
+			}
 		}
 	}
 }
