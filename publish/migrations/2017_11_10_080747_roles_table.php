@@ -14,7 +14,7 @@ class RolesTable extends Migration
     public function up()
     {
         Schema::table('roles', function (Blueprint $table) {
-            $table->text('permissions')->comment('菜单权限');
+            $table->text('datas')->comment('数据权限');
         });
     }
 

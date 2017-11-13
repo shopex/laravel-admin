@@ -13,7 +13,7 @@ class RolesController extends Controller
     public function __construct()
     {
         $config = new Configs();
-        $data = $config->getRouterPermission();
+        $data = $config->getAllpermission();
         view()->share("data",$data);
     }
     /**
@@ -67,7 +67,9 @@ class RolesController extends Controller
     {
         $this->validate($request, ['name' => 'required']);
         $data = $request->all();
-        $data['permissions'] = json_encode($data['permissions']);
+        if (isset($data['permissions'])) {
+            $data['permissions'] = json_encode($data['permissions']);
+        }
         Role::create($data);
 
         Session::flash('flash_message', 'Role added!');
@@ -99,7 +101,8 @@ class RolesController extends Controller
     public function edit($id)
     {
         $role = Role::findOrFail($id);
-        $role->permissions = json_decode($role->permissions,1);
+        $role->init();
+        // echo('<pre>');print_r($role->toArray());exit;
         return view('admin::roles.edit', compact('role'));
     }
 
@@ -117,7 +120,8 @@ class RolesController extends Controller
 
         $role = Role::findOrFail($id);
         $data = $request->all();
-        $data['permissions'] = json_encode($data['permissions']);
+        $data['permissions'] = json_encode(array_get($data,'permissions',[]));
+        $data['datas']       = json_encode(array_get($data,'datas',[]));
         $role->update($data);
 
         Session::flash('flash_message', 'Role updated!');
