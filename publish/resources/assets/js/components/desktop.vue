@@ -47,6 +47,7 @@
 						:zindex="((win.is_pin && !win.is_max)?500:10)+win.zindex"
 						:isfocus="win.isfocus"
 						:id="win.id"
+						:name="win.name"						
 						:initurl="win.url"
 						:initmax="win.is_max"
 						@max="onMaxChange"
@@ -273,10 +274,25 @@ export default {
 	methods: {
 		link_action(ev){
 			var el = this.find_el(ev.target, 'A', 3);
-			if(el && $(el).attr('target')=='window'){
-				this.open($(el).attr('href'));
-				ev.stopPropagation();
-		        ev.preventDefault();
+			if(el){
+				var target = $(el).attr('target');
+				var url = $(el).attr('href');
+				if(target=='window'){
+					this.open(url);
+					ev.stopPropagation();
+			        ev.preventDefault();
+				}else if(target && target.length>7 && target.substr(0, 7)=='window:'){
+					var win_name = target.substr(7);
+					var win = this.get_window_by_name(win_name);
+					if(win){
+						win.load(url);
+						this.active(win.id);
+					}else{
+						this.open(url, win_name);
+					}
+					ev.stopPropagation();
+			        ev.preventDefault();					
+				}
 			}
 		},
 		find_el(el, tag, n){
@@ -288,13 +304,14 @@ export default {
 				return false;
 			}
 		},
-		open(url) {
+		open(url, name) {
 			var win = {
 				id: this.win_id++,
 				width: 640,
 				height: 480,
 				zindex: 0,
 				title: "",
+				name: name,
 				is_min: false,
 				is_pin: false,
 				is_max: true,
@@ -324,18 +341,37 @@ export default {
 			}
 			return new_list;
 		},
-		show(id){
+		get_window_by_id(id){
+			if(!this.$refs.win){
+				return false;
+			}
 			for(var i=0; i<this.$refs.win.length; i++){
 				var win = this.$refs.win[i];
 				if(win.id==id){
-					if(win.is_min){
-						this.windows[id].is_min = false;
-						win.min_restore();
-						break;						
-					}else if(this.windows[id].isfocus){
-						win.min();
-						return;
-					}
+					return win;
+				}
+			}
+			return false;
+		},
+		get_window_by_name(name){
+			if(!this.$refs.win){
+				return false;
+			}
+			for(var i=0; i<this.$refs.win.length; i++){
+				var win = this.$refs.win[i];
+				if(win.name==name){
+					return win;
+				}
+			}
+			return false;
+		},
+		show(id){
+			var win = this.get_window_by_id(id);
+			if(win){
+				if(win.min){
+					win.min_restore();
+				}else{
+					win.min();
 				}
 			}
 			this.active(id);

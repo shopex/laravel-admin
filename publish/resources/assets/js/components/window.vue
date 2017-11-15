@@ -194,7 +194,9 @@
 
 <script>
 export default {
-	props: ["left", "top", "zindex", "isfocus", "initwidth", "initheight", "id", "initurl", "initmax"],
+	props: ["left", "top", "zindex", "isfocus", 
+			"initwidth", "initheight", "name",
+			"id", "initurl", "initmax"],
 	data() {
 		return {
 			width: 640,
@@ -310,6 +312,9 @@ export default {
 					(function(){
 
 						var $ = function(s,c,r){
+							if(s == window.document){
+								s = content;
+							}
 							c = c || that.$refs.body;
 							return jQuery.fn.init(s, c, r);
 						}
@@ -455,6 +460,9 @@ export default {
 			}
 		},
 		start_drag(e, type) {
+			if(this.is_max){
+				return;
+			}
 			$(window).on('mousemove', this.on_mousemove);
 			$(window).on('mouseup', this.on_mouseup);
 			this.draging = {
