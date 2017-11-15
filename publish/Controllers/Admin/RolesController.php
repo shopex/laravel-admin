@@ -67,9 +67,8 @@ class RolesController extends Controller
     {
         $this->validate($request, ['name' => 'required']);
         $data = $request->all();
-        if (isset($data['permissions'])) {
-            $data['permissions'] = json_encode($data['permissions']);
-        }
+        $data['permissions'] = json_encode(array_get($data,'permissions',[]));
+        $data['datas']       = json_encode(array_get($data,'datas',[]));
         Role::create($data);
 
         Session::flash('flash_message', 'Role added!');
@@ -101,7 +100,7 @@ class RolesController extends Controller
     public function edit($id)
     {
         $role = Role::findOrFail($id);
-        $role->init();
+        $role->initdata();
         // echo('<pre>');print_r($role->toArray());exit;
         return view('admin::roles.edit', compact('role'));
     }

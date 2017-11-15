@@ -20,6 +20,9 @@ class CheckPermission
         $as = $this->getRequiredRoleAsForRoute($request->route());
         // Check if a role is required for the route, and
         // if so, ensure that the user has that role.
+        if (!$request->user()) {
+            return redirect()->guest('login');
+        }
         if ($request->user() && $request->user()->hasPermissions($as)) {
             return $next($request);
         }
