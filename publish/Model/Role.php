@@ -26,10 +26,9 @@ class Role extends Model
     {
         return json_decode($this->datas,1);
     }
-    public function init(){
+    public function initdata(){
         $this->permissions  = json_decode($this->permissions,1);
         $this->datas        = json_decode($this->datas,1);
-        // return $this;
     }
     /**
      * Grant the given permission to a role.

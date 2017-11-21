@@ -53,7 +53,7 @@
                                 {{$mdl['name']}}
                             </label>
                         @endforeach
-                            <label>
+                            {{-- <label>
                                 <input type="radio" 
                                     name="datas[{{$modelkey}}][type]" 
                                     value="or"
@@ -72,7 +72,7 @@
                                     @endif
                                 > 
                                 并且
-                            </label>
+                            </label> --}}
                     @endforeach
                 @endif
                 </div>

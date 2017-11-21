@@ -8,7 +8,7 @@ use App\Role;
 use App\User;
 use Illuminate\Http\Request;
 use Session;
-
+use App\Models\Entity\Goods;
 class UsersController extends Controller
 {
     /**
@@ -48,9 +48,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = Role::select('id', 'name', 'label')->get();
-        $roles = $roles->pluck('label', 'name');
-
+        $roles = [];
         return view('admin::users.create', compact('roles'));
     }
     
@@ -70,6 +68,11 @@ class UsersController extends Controller
         $user = User::create($data);
 
         foreach ($request->roles as $role) {
+            $role['datas'] = json_encode( [
+                App\Models\Entity\Goods::class=>[
+                    'shop_id'=>[1,2],
+                ]
+            ]);
             $user->assignRole($role);
         }
 
@@ -101,16 +104,9 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        $roles = Role::select('id', 'name', 'label')->get();
-        $roles = $roles->pluck('label', 'name');
-
         $user = User::with('roles')->select('id', 'name', 'email')->findOrFail($id);
-        $user_roles = [];
-        foreach ($user->roles as $role) {
-            $user_roles[] = $role->name;
-        }
-
-        return view('admin::users.edit', compact('user', 'roles', 'user_roles'));
+        $roles = $user->roles->pluck('id')->implode(',');        
+        return view('admin::users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -123,7 +119,11 @@ class UsersController extends Controller
      */
     public function update($id, Request $request)
     {
-        $this->validate($request, ['name' => 'required', 'email' => 'required', 'roles' => 'required']);
+        $this->validate($request, [
+            'name' => 'required', 
+            'email' => 'required', 
+            'roles' => 'required']
+        );
 
         $data = $request->except('password');
         if ($request->has('password')) {
@@ -132,12 +132,20 @@ class UsersController extends Controller
 
         $user = User::findOrFail($id);
         $user->update($data);
-
         $user->roles()->detach();
-        foreach ($request->roles as $role) {
-            $user->assignRole($role);
+        $datas[2] = json_encode( [
+                Goods::class=>[
+                    'shop_id'=>[1,2],
+                ]
+            ]);
+        $roles = explode(',', $request->roles);
+        $datass = '';
+        foreach ($roles  as $role_id) {
+            if (isset($datas[$role_id])) {
+                $datass = $datas[$role_id];
+            }
+            $user->assignRole($role_id,$datass);
         }
-
         Session::flash('flash_message', 'User updated!');
 
         return redirect('admin/users');

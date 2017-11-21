@@ -30,6 +30,7 @@ class LubanAdminProvider extends ServiceProvider
             __DIR__ . '/../../publish/migrations/' => database_path('migrations'),
             __DIR__ . '/../../publish/Model/' => app_path(),
             __DIR__ . '/../../publish/Controllers/' => app_path('Http/Controllers'),
+            __DIR__ . '/../../publish/Scopes/' => app_path('Scopes'),
         ], 'php');
 
         $this->publishes([

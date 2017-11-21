@@ -12,7 +12,7 @@ trait HasRoles
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class)->withPivot('datas');
     }
     /**
      * A user may have multiple roles.
@@ -34,11 +34,9 @@ trait HasRoles
      *
      * @return mixed
      */
-    public function assignRole($role)
+    public function assignRole($role_id,$datas='')
     {
-        return $this->roles()->save(
-            Role::whereName($role)->firstOrFail()
-        );
+        return $this->roles()->attach($role_id,['datas'=>$datas]);
     }
 
     /**
