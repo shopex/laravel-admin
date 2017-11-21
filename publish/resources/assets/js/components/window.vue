@@ -78,12 +78,14 @@
 	border-radius: 5px;
 	box-shadow:0px 0px 8px rgba(0,0,0,0.5);
 }
+.w-box.focus{
+	box-shadow:0px 0px 25px rgba(0,0,0,0.3);
+}
 .w-box.is_max{
 	border-radius: 0;
 	border-top: 1px solid #ccc;
-}
-.w-box.focus{
-	box-shadow:0px 0px 25px rgba(0,0,0,0.3);
+	box-shadow: none;
+	border-left: 1px solid #ccc;
 }
 .w-body{
 	background: #fff;
@@ -242,6 +244,9 @@ export default {
 		this.$watch('is_max', function(){
 			that.$emit('max', that.id, that.is_max);
 		});
+		this.$watch('is_min', function(){
+			that.$emit('min', that.id, that.is_min);
+		});
 
 		this.title = "title";
 		if(this.initurl){
@@ -393,11 +398,11 @@ export default {
 		},
 		min(){
 			this.is_min = true;
+			if(this.is_max){
+				return;
+			}
 			this.masker_sync();
-
 			var that = this;
-
-			this.$emit('min');
 			var offset = this.taskbarOffset();
 			this.masker.show().animate({
 				left: offset.left,
@@ -410,7 +415,7 @@ export default {
 
 		},
 		normal(){
-			var that = this;
+			var that = this;	
 			this.masker_sync();
 			this.masker.show().animate({
 				left: that.normal_stat.left,
@@ -427,6 +432,10 @@ export default {
 			});
 		},
 		min_restore(){
+			if(this.is_max){
+				this.is_min = false;
+				return;
+			}
 			var that = this;
 			var offset = this.taskbarOffset();
 			this.masker.css('left', offset.left)
