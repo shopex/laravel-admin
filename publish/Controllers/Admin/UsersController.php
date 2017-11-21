@@ -9,6 +9,8 @@ use App\User;
 use Illuminate\Http\Request;
 use Session;
 use App\Models\Entity\Goods;
+use Shopex\LubanAdmin\Facades\Admin;
+use Shopex\LubanAdmin\Permission\Configs;
 class UsersController extends Controller
 {
     /**
@@ -48,10 +50,69 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = [];
+        $roles = 0;
         return view('admin::users.create', compact('roles'));
     }
-    
+    /**
+     * 根据用户ID和角色ID获取角色对应的需要model的权限
+     *
+     * @return void
+     */
+    public function getUserRolesModel(Request $request)
+    {
+        $this->validate($request, [
+            //'user_id' => 'required', 
+            'roles' => 'array'
+            ]
+        );
+        $config = new Configs();
+        $dataPermission = $config->getPermission('data');
+        $nowHasData = [];
+        if ($request->user_id > 0) {
+            $user = User::findOrFail($request->user_id);
+            foreach ($user->roles as $hasrole) {
+                $datas = json_decode($hasrole->pivot->datas,1);
+                if ($datas) {
+                    $nowHasData[$hasrole->pivot->role_id] = $datas;
+                }
+            }
+        }
+        $roles_id = array_pluck($request->roles,'value');
+        $roles = Role::findOrFail($roles_id);
+        $roleData = [];
+        foreach ($roles as $role) {
+            $data = $role->datas();
+            $roleData[$role->id]['name'] = $role->name;
+            $roleData[$role->id]['role_id'] = $role->id;
+            foreach ($data as $model_name => $row) {
+                if (array_has($dataPermission,$model_name)) {
+                    $permissiondata = array_get($dataPermission,$model_name);
+                    $permission = $permissiondata['permissions'];
+                    foreach ($row['row'] as $key) {
+                        if (array_has($permission,$key) && $permission[$key]['type'] == 'model') {
+                            $typeobject = Admin::getObjectInputName($permission[$key]['model']);
+                            $value = [];
+                            if ($typeobject) {
+                                if (isset($nowHasData[$role->id][$model_name][$permission[$key]['field']])) {
+                                    $value  = $nowHasData[$role->id][$model_name][$permission[$key]['field']];
+                                }
+
+                                $roleData[$role->id]['model'][$model_name][] = [
+                                    'field'=> $permission[$key]['field'],
+                                    'name'=> $permission[$key]['name'],
+                                    'object_name' => $typeobject,
+                                    'value'=>$value,
+                                ];
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+        
+        return response()->json(['status'=>'succ','data'=>$roleData]);
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -73,7 +134,7 @@ class UsersController extends Controller
                     'shop_id'=>[1,2],
                 ]
             ]);
-            $user->assignRole($role);
+            $user->assignRole($role,$role['datas']);
         }
 
         Session::flash('flash_message', 'User added!');
@@ -105,7 +166,8 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = User::with('roles')->select('id', 'name', 'email')->findOrFail($id);
-        $roles = $user->roles->pluck('id')->implode(',');        
+        $roles = $user->roles->pluck('id')->implode(','); 
+        $roles = $roles? $roles:0;       
         return view('admin::users.edit', compact('user', 'roles'));
     }
 
@@ -124,7 +186,6 @@ class UsersController extends Controller
             'email' => 'required', 
             'roles' => 'required']
         );
-
         $data = $request->except('password');
         if ($request->has('password')) {
             $data['password'] = bcrypt($request->password);
@@ -133,16 +194,12 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         $user->update($data);
         $user->roles()->detach();
-        $datas[2] = json_encode( [
-                Goods::class=>[
-                    'shop_id'=>[1,2],
-                ]
-            ]);
+        
+        $datas = $request->role_datas;
         $roles = explode(',', $request->roles);
-        $datass = '';
         foreach ($roles  as $role_id) {
             if (isset($datas[$role_id])) {
-                $datass = $datas[$role_id];
+                $datass = json_encode($datas[$role_id]);
             }
             $user->assignRole($role_id,$datass);
         }

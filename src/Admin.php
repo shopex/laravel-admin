@@ -57,7 +57,7 @@ class Admin{
 	 */
 	public function getObjectInputName($class_name){
 		foreach ($this->objectInputs as $name => $input) {
-			if ($input->_model == $class_name) {
+			if ($input->model == $class_name) {
 				return $name;
 			}
 		}
