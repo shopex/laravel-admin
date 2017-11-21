@@ -51,9 +51,9 @@
 						:initurl="win.url"
 						:initmax="win.is_max"
 						@max="onMaxChange"
+						@min="onMinChange"
 						@pin="pin"
-						@url="onUrlChange"						
-						@min="win.is_min=true;setLayers()"
+						@url="onUrlChange"
 						@focus="active(win.id)"
 						@close="close(win.id)"
 						@dragend="draging=false;active(win.id)"
@@ -207,7 +207,6 @@ $taskbar-border-active-color: #1d6d7d;
 	position: relative;
 
 	.workspace{
-		overflow: hidden;
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -367,14 +366,14 @@ export default {
 		},
 		show(id){
 			var win = this.get_window_by_id(id);
-			if(win){
-				if(win.min){
-					win.min_restore();
-				}else{
-					win.min();
-				}
+			if(win.is_min){
+				win.min_restore();
+				this.active(id);
+			}else if(win.isfocus){
+				win.min();
+			}else{
+				this.active(id);
 			}
-			this.active(id);
 		},
 		setLayers() {
 			var len = this.layers.length;
@@ -403,6 +402,10 @@ export default {
 			if(this.windows[id].isfocus){
 				this.updateTitle(this.windows[id]);
 			}
+		},
+		onMinChange(id, is_min){
+			this.windows[id].is_min = is_min;
+			this.setLayers();
 		},
 		onMaxChange(id, is_max){
 			this.windows[id].is_max = is_max;
