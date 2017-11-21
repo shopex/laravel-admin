@@ -23,6 +23,7 @@ class Admin{
 		Route::group(['middleware' => 'auth'], function () {
 			Route::resource('admin/roles', 'Admin\\RolesController');
 			Route::resource('admin/users', 'Admin\\UsersController');
+			Route::any('admin/users/roles/data', ['uses'=>'Admin\\UsersController@getUserRolesModel','as'=>'users.roles.data'] );
 			Route::Group(['prefix'=>'admin/generator'],function(){
 				Route::get('/',[
 						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@index',
@@ -51,7 +52,17 @@ class Admin{
 	public function getObjectInput($name){
 		return $this->objectInputs[$name];
 	}
-
+	/*
+		根据模型名称获取在typeobject中的名称
+	 */
+	public function getObjectInputName($class_name){
+		foreach ($this->objectInputs as $name => $input) {
+			if ($input->model == $class_name) {
+				return $name;
+			}
+		}
+		return '';
+	}
 	public function RegisterObjectInput($name, $model){
 		$input = new Input;
 		$input->setModel($model)->setType($name);

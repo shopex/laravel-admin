@@ -32,8 +32,7 @@ class Finder{
 		if(false == in_array('GET', $currentRouter->methods())){
 			throw new \Exception('使用Finder的路由必须支持POST.');
 		}
-		$currentPath= $currentRouter->uri();
-		$finder->setBaseUrl('/'.$currentPath);
+		$finder->setBaseUrl(url()->current());
 		$finder->setModel($model);
 		$finder->setTitle($title);
 		$request = request();
