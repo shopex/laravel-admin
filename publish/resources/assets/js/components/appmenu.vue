@@ -8,8 +8,10 @@
 		<a :style="{'padding-left': (depth*deprem)+'rem'}" 
 			v-if="item.items" v-on:click="toggle(i, $event)">{{item.label}}</a>
 		<a :style="{'padding-left': (depth*deprem)+'rem'}"
-			v-else v-bind:href="item.link" target="window">{{item.label}}</a>
-		<appmenu :level="depth+1" :menus="item.items"></appmenu>
+			v-else v-bind:href="item.link" :target="'window:'+(path?(path+'-'+i):i)">
+			{{item.label}}
+		</a>
+		<appmenu :level="depth+1" :menus="item.items" :path="path?(path+'-'+i):i"></appmenu>
 	</li>
   </ul>
 </template>
@@ -65,7 +67,7 @@ ul.appmenu{
 
 <script>
 export default {
-	props: ["menus", "level"],
+	props: ["menus", "level", "path"],
 	computed: {
 		depth(){
 			return this.level || 1;
