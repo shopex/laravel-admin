@@ -172,7 +172,11 @@ class Finder{
 		}
 		if(isset($this->_filters[0])){
 			foreach($this->_filters as $filter){
-				$query = call_user_func_array([$query, 'where'], $filter);
+				if (is_array($filter[2])) {
+					$query = call_user_func_array([$query, 'whereIn'], [$filter[0],$filter[2]]);
+				}else{
+					$query = call_user_func_array([$query, 'where'], $filter);
+				}
 			}
 		}
 		$results = $query->paginate($this->_pagenum);
