@@ -7,6 +7,7 @@ use Shopex\LubanAdmin\Finder\InfoPanel;
 use Shopex\LubanAdmin\Finder\Search;
 use Shopex\LubanAdmin\Finder\Tab;
 use Shopex\LubanAdmin\Finder\Sort;
+use Shopex\LubanAdmin\Finder\Modifier;
 use Illuminate\Support\Facades\Route;
 
 class Finder{
@@ -38,7 +39,11 @@ class Finder{
 		$request = request();
 		return $finder;
 	}
-
+	static function OrmModifier($model,$show_field)
+	{
+		$orm = new Modifier($model,$show_field);
+		return $orm;
+	}
 	public function setTitle($title){
 		$this->_title = $title;
 		return $this;
@@ -181,17 +186,24 @@ class Finder{
 		}
 		$results = $query->paginate($this->_pagenum);
 
+		$modifierName = [];
 		foreach($results as $row){
 			foreach($this->_columns as $i=>$col){
 				$item['$id'] = $row[$this->_id_column];
 				$item[$i] = $col->key?$row[$col->key]:'';
-				if($col->modifier){
+				if(is_callable($col->modifier) ){
 					$item[$i] = call_user_func_array($col->modifier, [$item[$i], $row]);
+				}elseif (is_object($col->modifier)) {
+					$modifierName[$i] = $col->modifier;
 				}
 			}
 			$items[] = $item;
 		}
-
+		if ($modifierName) {
+			foreach ($modifierName as $field => $orm) {
+				$items = $orm->process($items,$field);
+			}
+		}
 		$data = [
 			'count' => $results->count(),
 			'currentPage' => $results->currentPage(),
