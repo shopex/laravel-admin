@@ -16,9 +16,11 @@ class Modifier{
 	public function process($data,$field)
 	{	$ids = array_column($data,$field);
 		$modle = new $this->model;
-		foreach ($modle->find($ids)->toArray() as $datarow) {
-			$res[$datarow['id']] = $datarow[$this->showName];
-		}
+		$showName = $this->showName;
+
+		$res = $modle->find($ids)->mapWithKeys(function ($item) use ($showName)  {
+		    return [$item['id'] => $item[$showName]];
+		})->all();
 		foreach ($data as $key => $row) {
 			$data[$key][$field] = $res[$row[$field]];
 		}
