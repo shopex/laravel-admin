@@ -10,8 +10,9 @@ class Search{
 	public $optionType;
 	public $mode = '=';
 	public $value;
-
-	public $hidden = ['key', 'optionType'];
+	public $modifier;
+	public $type;
+	public $hidden = ['key', 'optionType','modifier'];
 
 	static public function parse_filters(&$searchs, $filters){
 		$return = [];
@@ -79,6 +80,9 @@ class Search{
 					$mode = '=';
 			}
 			if($value){
+				if ($searchs[$i]->modifier) {
+					$value = call_user_func_array($searchs[$i]->modifier, [$value]);
+				}
 				$return[] = [$key, $mode, $value];
 			}
 		}

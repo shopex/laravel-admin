@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class RolesTable extends Migration
+class RolesTablePermissions extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class RolesTable extends Migration
     public function up()
     {
         Schema::table('roles', function (Blueprint $table) {
-            $table->text('datas')->comment('数据权限');
+            $table->text('permissions')->comment('菜单权限');
         });
     }
 

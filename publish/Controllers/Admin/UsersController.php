@@ -36,7 +36,6 @@ class UsersController extends Controller
                     
                     ->addSearch('名称', 'name', 'string')
                     ->addSearch('邮箱', 'email', 'string')
-                    
                     ->addTab("全部", [])
                     ->addInfoPanel('基本信息', [$this, 'detail']);
 
@@ -128,13 +127,14 @@ class UsersController extends Controller
         $data['password'] = bcrypt($request->password);
         $user = User::create($data);
 
-        foreach ($request->roles as $role) {
-            $role['datas'] = json_encode( [
-                App\Models\Entity\Goods::class=>[
-                    'shop_id'=>[1,2],
-                ]
-            ]);
-            $user->assignRole($role,$role['datas']);
+        $datas = $request->role_datas;
+        $roles = explode(',', $request->roles);
+        foreach ($roles  as $role_id) {
+            $datass = [];
+            if (isset($datas[$role_id])) {
+                $datass = json_encode($datas[$role_id]);
+            }
+            $user->assignRole($role_id,$datass);
         }
 
         Session::flash('flash_message', 'User added!');
@@ -198,6 +198,7 @@ class UsersController extends Controller
         $datas = $request->role_datas;
         $roles = explode(',', $request->roles);
         foreach ($roles  as $role_id) {
+            $datass = [];
             if (isset($datas[$role_id])) {
                 $datass = json_encode($datas[$role_id]);
             }
