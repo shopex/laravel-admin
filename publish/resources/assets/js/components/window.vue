@@ -94,11 +94,11 @@
 .w-title{
 	line-height: 2.5rem;
 	padding-left: 0.5rem;
-	flex:1 1;
+	flex:5rem 1;
 	font-weight: bold;
 }
 .w-icons{
-	flex:0 0;
+	flex:4rem 0;
 	margin-left: 1rem;
 	padding-left: 1rem;
 	text-align: right;
@@ -117,6 +117,7 @@
 	user-select: none;		
 }
 .w-pin{
+	flex:1rem 0;
 	line-height: 2.5rem;
 	cursor: pointer;
 }
@@ -173,6 +174,7 @@
 	width:5px;
 	/*background: red;*/
 	cursor: ew-resize;
+	z-index: 999;
 }
 .w-sider-b{
 	position: absolute;
@@ -182,6 +184,7 @@
 	height:5px;	
 	/*background: green;*/
 	cursor: ns-resize;
+	z-index: 999;
 }
 .w-sider-rb{
 	position: absolute;
@@ -191,6 +194,7 @@
 	width:10px;
 /*	background: blue;*/
 	cursor: nwse-resize;
+	z-index: 999;
 }
 </style>
 
@@ -270,7 +274,7 @@ export default {
 			if($(el).hasClass('external')){
 				return;
 			}
-			if(el && (!$(el).attr('target') || $(el).attr('target')=='window')){
+			if(el && !$(el).attr('target')){
 				var url = $(el).attr('href');
 				if(url){
 					ev.stopPropagation();
@@ -336,7 +340,11 @@ export default {
 						}
 						try{
 							for(var i=0; i<scripts.length; i++){
-								eval(scripts[i].innerHTML);
+								if(scripts[i].getAttribute('src')){
+									content.append(scripts[i]);
+								}else{
+									eval(scripts[i].innerHTML);
+								}
 							}
 						}catch(e){
 							console && console.error(scripts[i].innerHTML);

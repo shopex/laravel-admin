@@ -2,7 +2,7 @@
 <div>
 	<div class="form-inline" v-for="(search, idx) in searchs">
 	  <div class="form-group">
-	    {{search.label}}
+	    <label>{{search.label}}</label>
 	  </div>
 	  <div class="form-group">
 	    <select name="mode[]" v-model="search.mode" 

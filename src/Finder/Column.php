@@ -13,11 +13,17 @@ class Column{
 	public $className;
 	public $modifier;
 	public $html = false;
+	public $lock = false;
 
 	public $hidden = ['modifier'];
 
 	function id(){
 		$this->_finder->setId($this->$key);
+		return $this;
+	}
+
+	function lock(){
+		$this->lock = true;
 		return $this;
 	}
 }

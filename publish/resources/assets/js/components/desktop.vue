@@ -87,7 +87,7 @@ $sidebar-bg: linear-gradient(45deg, #0f1e48, #1d6d7d);
 $sidebar-fg: #fff;
 $topbar-icons-width: 10rem;
 $sidebar-width: 20rem;
-$task-item-width: 10rem;
+$task-item-width: 20rem;
 $taskbar-border-color: #ccc;
 $taskbar-border-active-color: #1d6d7d;
 
