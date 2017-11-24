@@ -7,9 +7,9 @@
 	  <div class="form-group">
 	    <select name="mode[]" v-model="search.mode" 
 	    	v-on:change="search.value&&changed()" v-if="search.type=='string'">
+	    	<option value="begin">开始于</option>
 	    	<option value="=">是</option>
 	    	<option value="!=">不是</option>
-	    	<option value="begin">开始于</option>
 	    	<option value="has">包含</option>
 	    	<option value="not_begin">不开始于</option>
 	    	<option value="not_has">不包含</option>
@@ -26,7 +26,17 @@
 	    </span>
 	  </div>
 	  <div class="form-group">
-	    <input type="text" name="value[]" v-model="search.value" v-on:change="changed()" />
+	  	<template v-if="typeof(search.type)=='object'">
+		  	<select name="value[]" v-model="search.value" v-on:change="changed()">
+		  		<template v-for="(val, key, index) in search.type" >
+		    		<option :value="val" v-if="index == 0 " selected> {{key}} </option>
+		    		<option :value="val" v-else> {{key}} </option>
+		    	</template>
+		    </select>
+		</template>
+		<template  v-else>
+	    	<input type="text" name="value[]" v-model="search.value" v-on:change="changed()"/>
+	    </template>
 	  </div>
 	</div>
 </div>	

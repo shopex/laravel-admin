@@ -11,7 +11,7 @@ class Search{
 	public $mode = '=';
 	public $value;
 	public $modifier;
-
+	public $type;
 	public $hidden = ['key', 'optionType','modifier'];
 
 	static public function parse_filters(&$searchs, $filters){
