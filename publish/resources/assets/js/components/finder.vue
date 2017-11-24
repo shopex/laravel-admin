@@ -54,6 +54,7 @@
 					<button class="btn btn-default" v-on:click="go_page(-1, $event)" v-bind:disabled="finder.data.currentPage==1">
 						<i class="glyphicon glyphicon-menu-left"></i>
 					</button>
+					<input class="pagebox" v-model="pagevalue" v-on:input="jumppage">
 					<button class="btn btn-default" v-on:click="go_page(1, $event)" v-bind:disabled="finder.data.hasMorePages==false">
 						<i class="glyphicon glyphicon-menu-right"></i>
 					</button>
@@ -61,9 +62,37 @@
 			</div>
 
 			<div class="finder-header" ref="header">
-				<form class="finder-search-bar" v-on:submit="reload()" 
-					v-if="'workdesk'!=finder.tab_id && finder.searchs && finder.searchs.length>0">
-					<filters :searchs="finder.searchs" @change="reload" ref="filters"></filters>
+				<form class="finder-search-bar" v-on:submit="reload()" v-if="'workdesk'!=finder.tab_id && finder.searchs && finder.searchs.length>0">
+
+					<div class="form-inline" v-for="(search, idx) in finder.searchs">
+					  <div class="form-group">
+					    {{search.label}}
+					  </div>
+					  <div class="form-group">
+					    <select name="mode[]" v-model="search.mode" 
+					    	v-on:change="search.value&&reload()" v-if="search.type=='string'">
+					    	<option value="=">是</option>
+					    	<option value="!=">不是</option>
+					    	<option value="begin">开始于</option>
+					    	<option value="has">包含</option>
+					    	<option value="not_begin">不开始于</option>
+					    	<option value="not_has">不包含</option>
+					    </select>
+					    <select name="mode[]" v-model="search.mode"
+					    	v-on:change="search.value&&reload()" v-else-if="search.type=='number'">
+					    	<option value="=">=</option>
+					    	<option value="gt">&gt;</option>
+					    	<option value="lt">&lt;</option>
+					    </select>
+					    <span v-else>
+					    	:
+					    	<input type="hidden" name="mode[]" value="=" />
+					    </span>
+					  </div>
+					  <div class="form-group">
+					    <input type="text" name="value[]" v-model="search.value" v-on:change="reload()" />
+					  </div>
+					</div>
 				</form>
 
 				<div class="finder-workdesk-bar" v-if="!disable_workdesk && 'workdesk'==finder.tab_id">
@@ -113,7 +142,7 @@
 						</label>
 
 						<div class="row api-top-title" v-on:click="toggle_detail(idx, $event)">
-							<div v-for="(col, col_id) in finder.cols" v-bind:class="col_class[col_id]" v-if="!col.hidden">
+							<div :title="typeof(item[col_id])!='object' && !col.html? item[col_id] : ''" v-for="(col, col_id) in finder.cols" v-bind:class="col_class[col_id]" v-if="!col.hidden">
 								<span v-if="typeof(item[col_id])=='object' && item[col_id].date">
 									{{item[col_id].date}}
 								</span>
@@ -322,6 +351,15 @@
 	text-align: right;
 	white-space: nowrap;
 }
+.finder-pager .pagebox{
+	display: inline-block;
+	border-radius:4px;
+	border:1px solid #ccc;
+	vertical-align: middle;
+	width:40px;
+	height:36px;
+	text-align:center; 
+}
 .finder-pager >.dropdown > .btn-default{
 	border: none;
 }
@@ -357,6 +395,7 @@
 <script>
 export default {
 	  mounted (){
+	  	console.log(this.finder,789)
 	  	if(this.finder.batchActions && this.finder.batchActions.length>0){
 	  		this.select_mode = 'multi';
 	  	}
@@ -411,7 +450,12 @@ export default {
 	  		this.items_loading = true;
 			this.current_detail = undefined;
 
-			var filters = this.$refs.filters.data();
+			var filters = [];
+			for(var i=0; i<this.finder.searchs.length; i++){
+				if(this.finder.searchs[i].value){
+					filters.push([i, this.finder.searchs[i].value, this.finder.searchs[i].mode]);
+				}
+			}
 
 			var that = this;
 			$.ajax({
@@ -519,6 +563,14 @@ export default {
 			ev.stopPropagation();
 			this.reload(this.finder.data.currentPage+v);
 		},
+		jumppage(){
+			this.pagevalue = parseInt(this.pagevalue)
+			if(!this.pagevalue){
+				this.pagevalue = this.finder.data.currentPage	
+			}
+			if(this.pagevalue >this.finder.data.total)this.pagevalue =this.finder.data.total
+			this.reload(this.pagevalue);
+		},
 		select_tab (tab_id){
 			this.finder.tab_id = tab_id;
 			this.v_select_all = false;
@@ -623,7 +675,8 @@ export default {
 			batch_select_mode: false,
 			batch_select_value: undefined,
 			batch_select_lastidx: 0,
-			masker_bgcolor: 'rgba(255,255,255,0.4)'
+			masker_bgcolor: 'rgba(255,255,255,0.4)',
+			pagevalue:'',
 	  	}
 	  }
 	}
