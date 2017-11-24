@@ -103,7 +103,7 @@
 				</div>
 				<div class="finder-row">
 					<label class="finder-col-sel" v-if="select_mode=='multi'">
-						<input type="checkbox" v-on:click="select_all" v-model="v_select_all" />
+						<input type="checkbox" v-on:change="select_all" v-model="v_select_all" />
 					</label>
 					<label class="finder-col-sel" v-if="select_mode=='single'">
 						<input type="radio" style="visibility: hidden" />
@@ -477,6 +477,7 @@ export default {
 			});
 	  	},
 		select_all (e){
+			console.log(this.v_select_all,788)
 			if(this.v_select_all){
 				for(var i=0;i<this.finder.data.items.length;i++){
 					this.$set(this.checkbox, i, true);
@@ -568,7 +569,7 @@ export default {
 			if(!this.pagevalue){
 				this.pagevalue = this.finder.data.currentPage	
 			}
-			if(this.pagevalue >this.finder.data.total)this.pagevalue =this.finder.data.total
+			if(this.pagevalue >Math.ceil(this.finder.data.total/this.finder.data.perPage))this.pagevalue =Math.ceil(this.finder.data.total/this.finder.data.perPage)
 			this.reload(this.pagevalue);
 		},
 		select_tab (tab_id){
