@@ -57,7 +57,7 @@
     </div>
 </div>
 <script>
-$(function(){
+$(function($){
     new Vue({
         el: '#roles',
         data:{
