@@ -37,6 +37,7 @@ $(function(){
 	$('.main-content .finder-action-bar').replaceWith(component.$refs.actionbar);
 	$('.main-content .finder-header').replaceWith(component.$refs.header);
 	$('.main-content .finder-content').replaceWith(component.$refs.content);
+	component.resize();
 })
 </script>
 
