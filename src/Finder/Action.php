@@ -31,4 +31,9 @@ class Action{
 		$this->target = '#modal-large';
 		return $this;
 	}
+	function confirm($msg)
+	{
+		$this->confirm = $msg;
+		return $this;
+	}
 }
