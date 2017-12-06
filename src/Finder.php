@@ -74,7 +74,9 @@ class Finder{
 		$this->_sorts[] = $sort;
 		return $sort;
 	}
-
+	public function sorts(){
+		return $this->_sorts;
+	}
 	public function addAction($label, $do){
 		$action = $this->mkAction($label, $do);
 		$this->_actions[] = $action;
@@ -85,6 +87,10 @@ class Finder{
 		$action = $this->mkAction($label, $do);
 		$this->_batch_actions[] = $action;
 		return $action;
+	}
+
+	public function actions(){
+		return $this->_actions;
 	}
 
 	public function mkAction($label, $do){
@@ -108,6 +114,11 @@ class Finder{
 		return $tab;
 	}
 
+	public function tabs()
+	{
+		return $this->_tabs;
+	}
+
 	public function setId($colname){
 		$this->_id_column = $colname;
 		return $this;
@@ -121,6 +132,10 @@ class Finder{
 		return $panel;
 	}
 
+	public function infoPanels(){
+		return $this->_infoPanels;
+	}
+
 	public function addSearch($label, $key, $type=''){
 		$search = new Search($this);
 		$search->label = $label;
@@ -129,7 +144,9 @@ class Finder{
 		$this->_searchs[] = $search;
 		return $search;
 	}
-
+	public function searchs(){
+		return $this->_searchs;
+	}
 	public function addColumn($label, $key){
 		$col = new Column($this);
 		$col->label = $label;
@@ -137,21 +154,16 @@ class Finder{
 		$this->_columns[] = $col;
 		return $col;
 	}
-
-	public function actions(){
-		return $this->_actions;
+	public function cols(){
+		return $this->_columns;
 	}
-
+	
 	public function baseurl(){
 		return $this->_baseurl;
 	}
 
 	public function searchOptions(){
 		return $this->_searchOptions;
-	}
-
-	public function infoPanels(){
-		return $this->_infoPanels;
 	}
 
 	public function items(){
@@ -215,10 +227,6 @@ class Finder{
 		];
 
 		return $data;
-	}
-
-	public function cols(){
-		return $this->_columns;
 	}
 
 	public function title(){
