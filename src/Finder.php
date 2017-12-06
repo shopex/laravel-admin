@@ -138,6 +138,9 @@ class Finder{
 
 	public function addSearch($label, $key, $type=''){
 		$search = new Search($this);
+		if (!is_array($key)) {
+			$search->field = $key;
+		}
 		$search->label = $label;
 		$search->key = $key;		
 		$search->type = $type;

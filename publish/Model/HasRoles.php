@@ -23,7 +23,8 @@ trait HasRoles
     {
         $allpermissions = [];
         foreach ($this->roles as $role) {
-            $allpermissions = array_merge($role->permissions(),$allpermissions);
+            $permissions = $role->permissions();
+            $allpermissions = array_merge($permissions?$permissions:[],$allpermissions);
         }
         return $allpermissions;
     }
