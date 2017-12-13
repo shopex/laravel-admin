@@ -1,4 +1,5 @@
 <?php
+
 namespace Shopex\LubanAdmin\Finder;
 
 class Search{
@@ -80,7 +81,7 @@ class Search{
 				default:
 					$mode = '=';
 			}
-			if($value){
+			if($value !== ''){
 				if (is_array($key) && array_has($key,$item[3])) {
 					$key = $item[3];
 				}
