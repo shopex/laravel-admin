@@ -37,6 +37,14 @@ class Admin{
 						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@getGenerator',
 						'as'=>'admin.generator.index',
 					]);
+				Route::post('/code',[
+						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@getCode',
+						'as'=>'admin.generator.code',
+					]);
+				Route::post('/destroy',[
+						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@destroy',
+						'as'=>'admin.generator.destroy',
+					]);
 				Route::get('{id}/edit',[
 						'uses' => '\Shopex\LubanAdmin\Controllers\ProcessController@edit',
 						'as'=>'admin.generator.edit'

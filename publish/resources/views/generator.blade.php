@@ -20,15 +20,46 @@
                             @include('admin::generator-body')
                             <br>
                             <div class="form-group">
-                                <div class="col-md-offset-4 col-md-4">
+                                <div class="col-md-offset-4 col-md-8">
+
                                     <button type="submit" class="btn btn-primary" name="generate">生成</button>
                                     <input type="checkbox" name="staging">暂存
                                     <input type="checkbox" name="regen">重新生成
                                     <input type="checkbox" name="remove_file">移除文件
+                                    <button type="button" class="btn btn-primary" name="code" v-on:click="parse">Parse</button>
+
+
                                 </div>
                             </div>
                         </form>
-
+                        <textarea rows="10" cols="120" name="code" id="code" >CREATE TABLE IF NOT EXISTS `mydb`.`phase` (
+  `id` INT NOT NULL COMMENT 'ID',
+  `activity_id` INT NOT NULL COMMENT '活动',
+  `ticket_id` INT UNSIGNED NOT NULL COMMENT '预约',
+  `requirement` VARCHAR(45) NULL DEFAULT NULL COMMENT '条件',
+  `phrase_order` INT NOT NULL COMMENT '阶段排序',
+  `start_time` INT NULL COMMENT '开始时间',
+  `end_time` INT NULL COMMENT '结束时间',
+  PRIMARY KEY (`id`),
+  INDEX `fk_phrase_sales_idx` (`activity_id` ASC),
+  INDEX `fk_phrase_ticket1_idx` (`ticket_id` ASC),
+  CONSTRAINT `fk_phrase_sales`
+    FOREIGN KEY (`activity_id`)
+    REFERENCES `mydb`.`sales` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_phrase_activity1`
+    FOREIGN KEY (`activity_id`)
+    REFERENCES `wujie`.`activity` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_phrase_ticket1`
+    FOREIGN KEY (`ticket_id`)
+    REFERENCES `wujie`.`ticket` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = '活动阶段'</textarea>
                     </div>
                     @include('admin::generator-files')
                 </div>
@@ -57,6 +88,7 @@
         }) (jQuery.fn.clone);  
 
         $( document ).ready(function() {
+
             var app = new Vue({
               el: '#form',
               data: {
@@ -65,7 +97,33 @@
                 model_type:'{{ $generator->model_type }}',
                 route_group:'{{ $generator->route_group }}',
                 view_path:'{{ $generator->view_path }}',
-                model_title:'{{ $generator->view_path }}'
+                model_title:'{{ $generator->view_path }}',
+                curdtypekey:'{{ $generator->curdtypekey }}',
+                fields:[]
+              },
+              methods: {
+                parse : function (values) {
+                    var code = $("#code").val();
+                    var than = this;
+                    $.post(
+                        "{{url('/admin/generator/code')}}",
+                        {code:code},
+                        function(data,status){
+                            if (status == 'success') {
+                                than.crud_name = data.model;
+                                than.model_title = data.model_name;
+                                var tableFields = $('.table-fields')
+                                var newEntry = tableFields.find(".entry:first");
+                                for(var i in data.row){
+                                    than.fields.push(data.row[i])  ;
+                                }
+                                 $('.table-fields').find('.entry:last').remove();
+                                // s[s.length-1].remove();
+                            }
+                        }
+                    );
+
+                }   
               },
               computed: {
                  lower_crud_name:function(){
@@ -82,6 +140,7 @@
                  }
               }
             })
+
             $(document).on('click', '.btn-add', function(e) {
                 e.preventDefault();
                 var tableFields = $('.table-fields'),
@@ -106,6 +165,10 @@
                     .removeClass('btn-success').addClass('btn-danger')
                     .html('<span class="glyphicon glyphicon-minus"></span>');
             });
+            $('.table-fields').find('.entry:not(:last) .btn-add')
+                    .removeClass('btn-add').addClass('btn-remove')
+                    .removeClass('btn-success').addClass('btn-danger')
+                    .html('<span class="glyphicon glyphicon-minus"></span>');
         });
         /*
         $(function(){

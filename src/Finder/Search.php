@@ -22,7 +22,11 @@ class Search{
 			$i = $item[0];
 			$value = $item[1];
 			$mode = isset($item[2])?$item[2]:'=';
-
+			//兼容 [["id",">","1"]] 模式
+			if (!array_get($searchs,$i)) {
+			    $return[] = $item;
+			    continue;
+			}
 			$key = $searchs[$i]->key;
 			$searchs[$i]->mode = $mode;
 			$searchs[$i]->value = $value;

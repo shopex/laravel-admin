@@ -30,15 +30,15 @@ class ProcessController extends Controller
                     ->addAction('新建模型', [$this, 'getGenerator'])
                     ->addSort('按修改时间倒排', 'created_at', 'desc')
                     ->addSort('按修改时间正排', 'created_at')
-                    ->addBatchAction('删除', [$this, 'destroy'])
+                    ->addBatchAction('删除',route('admin.generator.destroy'))
                     ->addBatchAction('表关联', [$this, ''])
                     ->addColumn('操作', 'id')->modifier(function($id){
                         return '<a href="'.url("/admin/generator/$id/edit").' " title="编辑"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>编辑</button></a>';
                     })->html(true)->size(1)
-                    ->addColumn('模型名称', 'model_title')->size(1)
-                    ->addColumn('模型', 'crud_name')->size(1)
+                    ->addColumn('模型名称', 'model_title')->size(2)
+                    ->addColumn('模型', 'crud_name')->size(2)
                     ->addColumn('模型类型', 'model_type')->size(1)
-                    ->addColumn('模型命名空间', 'model_namespace')->size(1)
+                    ->addColumn('模型命名空间', 'model_namespace')->size(2)
                     ->addColumn('控制器命名空间', 'controller_namespace')->size(1)
                     ->addColumn('路由组前缀', 'route_group')->size(1)
                     ->addColumn('视图路径', 'view_path')->size(1)
@@ -95,8 +95,9 @@ class ProcessController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $id = $request->id;
         Generator::destroy($id);
 
         Session::flash('flash_message', 'Generator deleted!');
@@ -134,6 +135,8 @@ class ProcessController extends Controller
         $curdview = new CrudViewCommand();
         $curdtypekey = array_keys($curdview->getTypeLookup());
         $curdtype = array_combine($curdtypekey, $curdtypekey);
+        // echo('<pre>');print_r($curdtypekey);exit;
+        // echo('<pre>');print_r($generator->toArray());exit;
         return view('admin::generator',compact('generator','curdtype','files_array'));
     }
 
@@ -268,5 +271,68 @@ class ProcessController extends Controller
         $namespace = str_replace('/', '\\', $namespace);
         $namespace = str_replace('\\', ' ', $namespace);
         return str_replace(' ', '\\', ucwords($namespace));
+    }
+    public function getCode(Request $request){
+        $code = $request->code;
+        $codeRow = explode("\n", $code);
+        $res = [];
+        foreach ($codeRow as $row) {
+            $row = trim($row);
+            if (strpos($row,'`') === 0) {
+                $rowarr = $this->parseRow($row);
+                if ($rowarr) {
+                    $res['row'][] = $rowarr;
+                }
+                // $res['row'][]= $this->parseRow($row); 
+            }
+            if (strpos($row,'COMMENT') === 0) {
+                // echo('<pre>');print_r($row);exit;
+                $table = $this->trimRow($row);
+                $res['model_name'] = end($table);
+            }
+            if (strpos($row,'CREATE TABLE') !== false) {
+                $resname = $this->trimRow($row);
+                $tablename = $resname[count($resname)-2];
+                if (strpos($tablename,'.') !== false) {
+                    list($tmp,$tablename) = explode('.',$tablename);
+                }
+                $res['model'] = ucfirst(camel_case($tablename) );
+            }
+        }
+        return response()->json($res);
+    }
+    private function parseRow($row){
+        $types = ['INT'=>'number',"CHAR"=>"string","TEXT"=>'text'];
+        $data = $this->trimRow($row);
+        $filers = ['id','created_at','updated_at'];
+        $rowData['field'] = $data[0];
+        if (in_array($rowData['field'],$filers)) {
+            return false;
+        }
+        $rowData['name'] = end($data);
+        $rowData['type'] = "string";
+        $rowData['required'] = 0;
+        $rowData['search'] = 0;
+        $rowData['inlist'] = 0;
+        foreach ($types as $dbtype => $ormtype) {
+            if (strpos($data[1],$dbtype) !== false) {
+                $rowData['type'] = $ormtype;
+                if ($ormtype != 'text') {
+                    $rowData['search'] = 1;
+                    $rowData['inlist'] = 1;
+                }
+            }
+        }
+        foreach ($data as $key => $value) {
+            if ($value == "NOT" && $data[$key+1] == "NULL") {
+                $rowData['required'] = 1;
+            }
+        }
+        return $rowData;
+    }
+    private function trimRow($row){
+        $row = str_replace(['`','\'',','], "", $row);
+        $data = explode(' ',$row);
+        return $data;
     }
 }
