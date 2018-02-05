@@ -21,8 +21,14 @@ class Modifier{
 		$res = $modle->find($ids)->mapWithKeys(function ($item) use ($showName)  {
 		    return [$item['id'] => $item[$showName]];
 		})->all();
+		//当当前列值，在另外一个表中不存在时，显示原始值
 		foreach ($data as $key => $row) {
-			$data[$key][$field] = $res[$row[$field]];
+			if (isset($res[$row[$field]])) {
+				$data[$key][$field] = $res[$row[$field]];
+			}else{
+				$data[$key][$field] = $row[$field];
+			}
+			
 		}
 		return $data;
 	}
