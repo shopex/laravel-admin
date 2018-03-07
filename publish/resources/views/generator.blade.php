@@ -1,4 +1,4 @@
-  @extends('admin::layout')
+@extends('admin::layout')
 
 @section('title', '代码生成器')
 

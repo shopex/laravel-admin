@@ -85,7 +85,7 @@ class Data
 
 		if (class_exists($class_name)) {
 			$obj = new $class_name;
-			if (is_callable($obj,$func)) {
+			if (is_callable([$obj,$func])) {
 				if ($params && !is_array($params)) {
 					$params = [$params];
 				}
@@ -93,7 +93,13 @@ class Data
 				if ($ids) {
 	    			return [$data['field']=>$ids];
 	    		}
+	    		return [];
+			}else{
+				throw new \Exception("calss ".$class_name. "func ".$func."not callable", 1);
 			}
+		}else{
+			throw new \Exception($class_name."not found", 1);
+			
 		}
 		return [];
 	}

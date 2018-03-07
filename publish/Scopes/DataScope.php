@@ -37,6 +37,9 @@ class DataScope implements Scope
                  $builder->where(function ($builder) use ($whereGroup) {
                     foreach ($whereGroup as $key => $group) {
                         foreach ($group as $field => $value) {
+                            if (!is_array($value)) {
+                                $value = explode(",",$value);
+                            }
                             $builder->orWhereIn($field, $value);
                         }
                     }

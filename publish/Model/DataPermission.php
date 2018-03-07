@@ -15,7 +15,8 @@ trait DataPermission
     protected static function boot()
     {
         parent::boot();
-
-        static::addGlobalScope(new DataScope(self::class) );
+        if (!\App::runningInConsole()) {
+            static::addGlobalScope(new DataScope(self::class) );
+        }
     }
 }
