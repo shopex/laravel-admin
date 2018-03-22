@@ -153,7 +153,6 @@ class Request extends Builder
 
         
     	$sql = $this->grammar->getSqlComponents($this);
-        
         $sr = new SearchRequest();
         
         if (isset($sql['columns']) && $sql['columns']) {
@@ -177,6 +176,9 @@ class Request extends Builder
             'credentials' => \Grpc\ChannelCredentials::createInsecure(),
         ]);
         list($reply, $status) = $client->{$this->rpc}($sr)->wait();
+        if ($status->code !== 0) {
+            return [];
+        }
         if (isset($sql['aggregate'])) {
             $aggregate = new \stdClass();
             $aggregate->aggregate = $reply->getCount();
@@ -185,24 +187,41 @@ class Request extends Builder
         if (count($reply->getData())<1) {
             return [];
         }
+        
+        $data = $this->parseObject($reply->getData());
+        return $data;
+    }
+    public function parseObject($objects){
         $res = [];
-        foreach ($reply->getData() as $row) {
-            $methods = get_class_methods($row); 
-            foreach ($methods as $key => $method) {
-                $attr = $this->parserGrpcMethod($method);
-                if ($attr) {
-                    $data = $row->$method();
-                    if (!is_object($data)) {
-                        $rowData[$attr] = $data;
-                    }
+        if (is_object($objects)) {
+            if ($objects instanceof \Google\Protobuf\Internal\RepeatedField) {
+                foreach ($objects as $object) {
+                    $objectData = $this->objectToArray($object);
+                    $res[] =  $objectData;
                 }
+            }else{
+                $res = $this->objectToArray($objects);
             }
-            $res[] =  $rowData;
         }
         return $res;
-     //    return $this->connection->select(
-     //        $this->toSql(), $this->getBindings(), ! $this->useWritePdo
-     //    );
+    }
+    public function objectToArray($object){
+        $objectData = [];
+        $methods = get_class_methods($object); 
+        foreach ($methods as $key => $method) {
+            $attr = $this->parserGrpcMethod($method);
+            if ($attr) {
+                $value = $object->$method();
+                if ($value instanceof \Google\Protobuf\Internal\RepeatedField) {
+                    $objectData[$attr] = $this->parseObject($value);
+                }else if (is_object($value)) {
+                    $objectData[$attr] = $this->objectToArray($value);
+                }else{
+                    $objectData[$attr] = $value;
+                }
+            }
+        }
+        return $objectData;
     }
     public function parserGrpcMethod($methodName){
         if (strpos($methodName, "get") === 0) {
