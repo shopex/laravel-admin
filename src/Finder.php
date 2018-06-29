@@ -63,7 +63,10 @@ class Finder{
 		$this->_pagenum = $n;
 		return $this;
 	}
-
+	public function getPageNum(){
+		$this->_pagenum = request()->get("finder_page_num",$this->_pagenum);
+		return (int)$this->_pagenum;
+	}
 	public function addSort(){
 		$args = func_get_args();
 		$sort = new Sort($this);
@@ -199,7 +202,7 @@ class Finder{
 				}
 			}
 		}
-		$results = $query->paginate($this->_pagenum);
+		$results = $query->paginate($this->getPageNum());
 
 		$modifierName = [];
 		foreach($results as $row){
